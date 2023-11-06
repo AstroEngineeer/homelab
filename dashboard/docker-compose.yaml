@@ -7,6 +7,9 @@ networks:
   chilflix_backend:
     driver: bridge
     external: true
+  chilflix_frontend:
+    driver: bridge
+    external: true
 
 services:
   homarr:
@@ -15,6 +18,7 @@ services:
     networks:
       - dashboard
       - chilflix_backend
+      - chilflix_frontend
     restart: unless-stopped
     ports:
      - 7575:7575
@@ -22,15 +26,14 @@ services:
       - ./homarr-configs:/app/data/configs
       - ./homarr-icons:/app/public/icons
       - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - EDIT_MODE_PASSWORD=joker@123
+    env_file:
+      - .env
 
   dash:
     container_name: dashdot
     image: mauricenino/dashdot:latest
     networks:
       - dashboard
-      - chilflix_backend
     ports:
       - 80:3001
     restart: unless-stopped
@@ -41,3 +44,6 @@ services:
       - DASHDOT_SHOW_HOST=true
       - DASHDOT_ALWAYS_SHOW_PERCENTAGES=true
       - DASHDOT_ACCEPT_OOKLA_EULA=true
+
+# -------.env-----------
+# EDIT_MODE_PASSWORD
