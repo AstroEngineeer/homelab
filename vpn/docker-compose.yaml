@@ -1,0 +1,41 @@
+version: '3.8'
+
+networks:
+  chilflix_backend:
+    driver: bridge
+    external: true
+
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      - chilflix_backend
+    ports:
+      - 8888:8888/tcp
+      - 8388:8388/tcp
+      - 8388:8388/udp
+      - 9696:9696/tcp # Prowlarr
+    extra_hosts:
+      - radarr:172.18.0.200
+      - sonarr:172.18.0.201
+    volumes:
+      - ./gluetun-config:/gluetun
+    env_file:
+      - .env
+    environment:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=wireguard
+      - TZ=Asia/Kolkata
+    restart: always
+
+# -------.env-----------
+# VPN_ENDPOINT_IP
+# VPN_ENDPOINT_PORT
+# WIREGUARD_PUBLIC_KEY
+# WIREGUARD_PRIVATE_KEY
+# WIREGUARD_ADDRESSES
