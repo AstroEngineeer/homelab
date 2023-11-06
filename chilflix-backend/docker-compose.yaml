@@ -81,13 +81,13 @@ services:
       networks:
         - chilflix_backend
       ports:
-        - 8080:8080
+        - 9090:9090
       environment:
         - PUID=1000
         - PGID=1000
         - UMASK=0022
         - TZ=Asia/Kolkata
-        - WEBUI_PORT=8080
+        - WEBUI_PORT=9090
       volumes:
         - ./qbittorrent-config:/config
         - /mnt/blackhole/downloads:/downloads
