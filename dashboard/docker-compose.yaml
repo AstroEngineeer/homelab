@@ -10,6 +10,9 @@ networks:
   chilflix_frontend:
     driver: bridge
     external: true
+  proxy:
+    driver: bridge
+    external: true
 
 services:
   homarr:
@@ -19,6 +22,7 @@ services:
       - dashboard
       - chilflix_backend
       - chilflix_frontend
+      - proxy
     restart: unless-stopped
     ports:
      - 7575:7575
@@ -28,15 +32,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - .env
-
   dash:
     container_name: dashdot
     image: mauricenino/dashdot:latest
     networks:
       - dashboard
+      - proxy
     ports:
-      - 80:3001
-    restart: unless-stopped
+      - 3001:3001
     privileged: true
     volumes:
       - /:/mnt/host:ro
@@ -44,6 +47,8 @@ services:
       - DASHDOT_SHOW_HOST=true
       - DASHDOT_ALWAYS_SHOW_PERCENTAGES=true
       - DASHDOT_ACCEPT_OOKLA_EULA=true
+    restart: unless-stopped
+
 
 # -------.env-----------
 # EDIT_MODE_PASSWORD

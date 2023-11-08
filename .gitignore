@@ -3,3 +3,5 @@
 **/*-configs
 **/*-icons
 **/.env
+**/config.json
+!**/traefik-config

@@ -1,0 +1,31 @@
+version: '3.8'
+
+networks:
+  proxy:
+    external: true
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - ./traefik-config:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CF_DNS_API_TOKEN=${CLOUDFLARE_TOKEN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.xerogravity.space`)"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik.tls.domains[0].main=xerogravity.space"
+      - "traefik.http.routers.traefik.tls.domains[0].sans=*.xerogravity.space"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    restart: unless-stopped
