@@ -6,3 +6,4 @@
 **/.env
 **/config.json
 !**/traefik-config
+xerogravity.space.cer
