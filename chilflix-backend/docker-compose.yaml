@@ -18,6 +18,22 @@ services:
     volumes:
       - ./prowlarr-config:/config
     restart: always
+  
+  prowlarr2:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr2
+    networks:
+      - chilflix_backend
+    ports:
+      - 9697:9696
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=0002
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./prowlarr2-config:/config
+    restart: always
  
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -92,3 +108,17 @@ services:
         - ./qbittorrent-config:/config
         - /mnt/blackhole/downloads:/downloads
       restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    networks:
+        - chilflix_backend
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=Asia/Kolkata
+    ports:
+      - "8191:8191"
+    restart: unless-stopped 

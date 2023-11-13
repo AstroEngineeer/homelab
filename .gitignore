@@ -2,6 +2,7 @@
 **/*-cache
 **/*-configs
 **/*-icons
+**/*-data
 **/.env
 **/config.json
 !**/traefik-config

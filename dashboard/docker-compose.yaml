@@ -49,6 +49,15 @@ services:
       - DASHDOT_ACCEPT_OOKLA_EULA=true
     restart: unless-stopped
 
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    volumes:
+      - ./uptime-kuma-data:/app/data
+    ports:
+      - "3002:3001"  # <Host Port>:<Container Port>
+    restart: always
+
 
 # -------.env-----------
 # EDIT_MODE_PASSWORD
