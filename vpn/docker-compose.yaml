@@ -1,10 +1,5 @@
 version: '3.8'
 
-networks:
-  chilflix_backend:
-    driver: bridge
-    external: true
-
 services:
   gluetun:
     image: qmcgaw/gluetun:latest
@@ -33,9 +28,7 @@ services:
       - TZ=Asia/Kolkata
     restart: always
 
-# -------.env-----------
-# VPN_ENDPOINT_IP
-# VPN_ENDPOINT_PORT
-# WIREGUARD_PUBLIC_KEY
-# WIREGUARD_PRIVATE_KEY
-# WIREGUARD_ADDRESSES
+networks:
+  chilflix_backend:
+    driver: bridge
+    external: true

@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  dockge:
+    image: louislam/dockge:1
+    container_name: dockge
+    restart: unless-stopped
+    ports:
+      - 5001:5001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./dockge-data:/app/data
+      - /home/batman/homelab:/home/batman/homelab
+    environment:
+      - DOCKGE_STACKS_DIR=/home/batman/homelab
+    networks:
+      - dashboard
+
+networks:
+  dashboard:
+    driver: bridge
+    external: true

@@ -1,19 +1,4 @@
-version: '3.8'
-
-networks:
-  dashboard:
-    driver: bridge
-    external: true
-  chilflix_backend:
-    driver: bridge
-    external: true
-  chilflix_frontend:
-    driver: bridge
-    external: true
-  proxy:
-    driver: bridge
-    external: true
-
+version: "3.8"
 services:
   homarr:
     container_name: homarr
@@ -22,23 +7,19 @@ services:
       - dashboard
       - chilflix_backend
       - chilflix_frontend
-      - proxy
     restart: unless-stopped
     ports:
-     - 7575:7575
+      - 7575:7575
     volumes:
       - ./homarr-configs:/app/data/configs
       - ./homarr-icons:/app/public/icons
       - ./homarr-data:/data
       - /var/run/docker.sock:/var/run/docker.sock
-    env_file:
-      - .env
   dash:
     container_name: dashdot
     image: mauricenino/dashdot:latest
     networks:
       - dashboard
-      - proxy
     ports:
       - 3001:3001
     privileged: true
@@ -49,7 +30,6 @@ services:
       - DASHDOT_ALWAYS_SHOW_PERCENTAGES=true
       - DASHDOT_ACCEPT_OOKLA_EULA=true
     restart: unless-stopped
-
   uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
@@ -57,9 +37,17 @@ services:
       - ./uptime-kuma-data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - "3002:3001"  # <Host Port>:<Container Port>
+      - 3002:3001
     restart: always
-
-
-# -------.env-----------
-# EDIT_MODE_PASSWORD
+    networks:
+      - dashboard
+networks:
+  dashboard:
+    driver: bridge
+    external: true
+  chilflix_backend:
+    driver: bridge
+    external: true
+  chilflix_frontend:
+    driver: bridge
+    external: true

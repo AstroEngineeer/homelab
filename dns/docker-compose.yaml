@@ -1,10 +1,5 @@
 version: "3.8"
 
-networks:
-  dns:
-    driver: bridge
-    external: true
-
 services:
   bind9:
     container_name: bind9
@@ -16,3 +11,8 @@ services:
       - 53:53/udp
       - 127.0.0.1:953:953/tcp
     restart: always
+
+networks:
+  dns:
+    driver: bridge
+    external: true

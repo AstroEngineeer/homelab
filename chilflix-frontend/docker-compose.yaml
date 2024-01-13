@@ -1,27 +1,10 @@
-version: '3.8'
-
-networks:
-  chilflix_frontend:
-    driver: bridge
-    external: true
-  chilflix_backend:
-    driver: bridge
-    external: true
-  proxy:
-    driver: bridge
-    external: true
-
+version: "3.8"
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
     user: 1000:1000
     network_mode: host
-  #  networks:
-  #    - chilflix_frontend
-  #    - proxy
-  #  ports:
-  #    - 8096:8096
     volumes:
       - ./jellyfin-config:/config
       - ./jellyfin-cache:/cache
@@ -30,20 +13,25 @@ services:
     restart: unless-stopped
     extra_hosts:
       - host.docker.internal:host-gateway
-
   jellyseerr:
-      image: fallenbagel/jellyseerr:latest
-      container_name: jellyseerr
-      user: 1000:1000
-      networks:
-        - chilflix_frontend
-        - chilflix_backend
-        - proxy
-      ports:
-          - 5055:5055
-      volumes:
-          - ./jellyseerr-config:/app/config
-      environment:
-          - LOG_LEVEL=debug
-          - TZ=Asia/Kolkata
-      restart: unless-stopped
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    user: 1000:1000
+    networks:
+      - chilflix_frontend
+      - chilflix_backend
+    ports:
+      - 5055:5055
+    volumes:
+      - ./jellyseerr-config:/app/config
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Asia/Kolkata
+    restart: unless-stopped
+networks:
+  chilflix_frontend:
+    driver: bridge
+    external: true
+  chilflix_backend:
+    driver: bridge
+    external: true

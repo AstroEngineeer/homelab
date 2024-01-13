@@ -1,8 +1,5 @@
 version: '3.8'
 
-networks:
-  proxy:
-    external: true
 services:
   traefik:
     image: traefik:latest
@@ -29,3 +26,7 @@ services:
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
     restart: unless-stopped
+
+networks:
+  proxy:
+    external: true

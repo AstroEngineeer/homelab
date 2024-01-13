@@ -1,10 +1,5 @@
 version: '3.8'
 
-networks:
-  chilflix_backend:
-    driver: bridge
-    external: true
-
 services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -122,3 +117,8 @@ services:
     ports:
       - "8191:8191"
     restart: unless-stopped 
+
+networks:
+  chilflix_backend:
+    driver: bridge
+    external: true
