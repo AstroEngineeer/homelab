@@ -1,48 +1,23 @@
 version: "3.8"
 services:
   homarr:
-    container_name: homarr
     image: ghcr.io/ajnart/homarr:latest
-    networks:
-      - dashboard
-      - chilflix_backend
-      - chilflix_frontend
+    container_name: homarr
     restart: unless-stopped
     ports:
       - 7575:7575
+    networks:
+      - monitoring
+      - chilflix_backend
+      - chilflix_frontend
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./homarr-configs:/app/data/configs
       - ./homarr-icons:/app/public/icons
       - ./homarr-data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-  dash:
-    container_name: dashdot
-    image: mauricenino/dashdot:latest
-    networks:
-      - dashboard
-    ports:
-      - 3001:3001
-    privileged: true
-    volumes:
-      - /:/mnt/host:ro
-    environment:
-      - DASHDOT_SHOW_HOST=true
-      - DASHDOT_ALWAYS_SHOW_PERCENTAGES=true
-      - DASHDOT_ACCEPT_OOKLA_EULA=true
-    restart: unless-stopped
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
-    volumes:
-      - ./uptime-kuma-data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 3002:3001
-    restart: always
-    networks:
-      - dashboard
+  
 networks:
-  dashboard:
+  monitoring:
     driver: bridge
     external: true
   chilflix_backend:

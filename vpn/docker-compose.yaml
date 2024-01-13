@@ -4,6 +4,7 @@ services:
   gluetun:
     image: qmcgaw/gluetun:latest
     container_name: gluetun
+    restart: always
     cap_add:
       - NET_ADMIN
     devices:
@@ -26,7 +27,6 @@ services:
       - VPN_SERVICE_PROVIDER=custom
       - VPN_TYPE=wireguard
       - TZ=Asia/Kolkata
-    restart: always
 
 networks:
   chilflix_backend:

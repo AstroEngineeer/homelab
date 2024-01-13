@@ -14,6 +14,10 @@ docker network create \
 
 docker network create \
     --driver=bridge \
+    monitoring
+
+docker network create \
+    --driver=bridge \
     dns
 
 docker network create \

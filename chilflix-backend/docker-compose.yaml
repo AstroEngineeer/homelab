@@ -4,6 +4,7 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
+    restart: always
     network_mode: container:gluetun
     environment:
       - PUID=1000
@@ -11,14 +12,13 @@ services:
       - UMASK=0002
       - TZ=Asia/Kolkata
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./prowlarr-config:/config
-    restart: always
   
-  prowlarr2:
+  prowlarr-anime:
     image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr2
-    networks:
-      - chilflix_backend
+    container_name: prowlarr-anime
+    restart: always
     ports:
       - 9697:9696
     environment:
@@ -27,14 +27,14 @@ services:
       - UMASK=0002
       - TZ=Asia/Kolkata
     volumes:
-      - ./prowlarr2-config:/config
-    restart: always
+      - /etc/localtime:/etc/localtime:ro
+      - ./prowlarr-anime-config:/config
  
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     networks:
-      chilflix_backend:
+      default:
         ipv4_address: 172.18.0.200
     ports:
       - 7878:7878
@@ -44,16 +44,15 @@ services:
       - UMASK=0002
       - TZ=Asia/Kolkata
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./radarr-config:/config
-      - /mnt/blackhole/movies:/movies
-      - /mnt/blackhole/downloads:/downloads
-    restart: unless-stopped
+      - /mnt/blackhole/data:/data
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     networks:
-      chilflix_backend:
+      default:
         ipv4_address: 172.18.0.201
     ports:
       - 8989:8989
@@ -63,16 +62,16 @@ services:
       - UMASK=0002
       - TZ=Asia/Kolkata
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./sonarr-config:/config
-      - /mnt/blackhole/tv:/tv
-      - /mnt/blackhole/downloads:/downloads
-    restart: unless-stopped
+      - /mnt/blackhole/data:/data
   
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
-    networks:
-      - chilflix_backend
+    restart: unless-stopped
+    ports:
+      - 6767:6767
     environment:
       - PUID=1000
       - PGID=1000
@@ -80,45 +79,37 @@ services:
       - TZ=Asia/Kolkata
     volumes:
       - ./bazarr-config:/config
-      - /mnt/blackhole/movies:/movies
-      - /mnt/blackhole/tv:/tv
-    ports:
-      - 6767:6767
-    restart: unless-stopped
+      - /mnt/blackhole/data/media:/data/media
 
   qbittorrent:
       image: lscr.io/linuxserver/qbittorrent:latest
       container_name: qbittorrent
-      networks:
-        - chilflix_backend
+      restart: unless-stopped
       ports:
-        - 9090:9090
+        - 8080:8080
       environment:
         - PUID=1000
         - PGID=1000
         - UMASK=0022
         - TZ=Asia/Kolkata
-        - WEBUI_PORT=9090
+        - WEBUI_PORT=8080
       volumes:
         - ./qbittorrent-config:/config
-        - /mnt/blackhole/downloads:/downloads
-      restart: unless-stopped
+        - /mnt/blackhole/data/torrents:/data/torrents
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
-    networks:
-        - chilflix_backend
+    restart: unless-stopped 
+    ports:
+      - 8191:8191
     environment:
       - LOG_LEVEL=info
       - LOG_HTML=false
       - CAPTCHA_SOLVER=none
       - TZ=Asia/Kolkata
-    ports:
-      - "8191:8191"
-    restart: unless-stopped 
 
 networks:
-  chilflix_backend:
-    driver: bridge
+  default:
+    name: chilflix_backend
     external: true

@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  dash:
+    image: mauricenino/dashdot:latest
+    container_name: dashdot
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - 3001:3001
+    environment:
+      - DASHDOT_SHOW_HOST=true
+      - DASHDOT_ALWAYS_SHOW_PERCENTAGES=true
+      - DASHDOT_ACCEPT_OOKLA_EULA=true
+    volumes:
+      - /:/mnt/host:ro
+    
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - 3002:3001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./uptime-kuma-data:/app/data
+
+networks:
+  default:
+    name: monitoring
+    external: true

@@ -4,30 +4,31 @@ services:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
     user: 1000:1000
+    restart: unless-stopped
     network_mode: host
     volumes:
       - ./jellyfin-config:/config
       - ./jellyfin-cache:/cache
-      - /mnt/blackhole/movies:/media/movies
-      - /mnt/blackhole/tv:/media/tv
-    restart: unless-stopped
+      - /mnt/blackhole/data/media:/data/media
     extra_hosts:
       - host.docker.internal:host-gateway
+
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     user: 1000:1000
+    restart: unless-stopped
     networks:
       - chilflix_frontend
       - chilflix_backend
     ports:
       - 5055:5055
-    volumes:
-      - ./jellyseerr-config:/app/config
     environment:
       - LOG_LEVEL=debug
       - TZ=Asia/Kolkata
-    restart: unless-stopped
+    volumes:
+      - ./jellyseerr-config:/app/config
+
 networks:
   chilflix_frontend:
     driver: bridge
