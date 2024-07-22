@@ -1,9 +1,8 @@
-**/*-config
-**/*-cache
-**/*-configs
-**/*-icons
-**/*-data
-**/.env
-**/config.json
-!**/traefik-config
-*.cer
+*-config
+*-cache
+*-configs
+*-icons
+*-data
+*.env
+config.json
+data

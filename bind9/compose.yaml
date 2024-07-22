@@ -1,0 +1,14 @@
+services:
+  bind9:
+    image: internetsystemsconsortium/bind9:9.19
+    container_name: bind9
+    volumes:
+      - ./bind-config:/etc/bind
+      - /var/cache/bind
+      - /var/lib/bind
+      - /var/log
+    ports:
+      - 53:53/udp
+      - 53:53/tcp
+      - 127.0.0.1:953:953/tcp
+    restart: always
