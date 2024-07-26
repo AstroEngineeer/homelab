@@ -7,3 +7,18 @@ services:
     ports:
       - 3001:3001
     restart: always
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.uptime-kuma.tls=true"
+      - "traefik.http.routers.uptime-kuma.entrypoints=https"
+      - "traefik.http.routers.uptime-kuma.rule=Host(`uptime-kuma.local.xerogravity.space`)"
+      - "traefik.http.routers.uptime-kuma.middlewares=redirect-header"
+      - "traefik.http.routers.uptime-kuma.service=uptime-kuma"
+      - "traefik.http.services.uptime-kuma.loadbalancer.server.port=3001"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

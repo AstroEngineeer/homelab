@@ -1,0 +1,47 @@
+services:
+  traefik:
+    image: traefik:v3.1.0
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      CF_DNS_API_TOKEN_FILE: /run/secrets/cf_api_token
+      TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
+    secrets:
+      - cf_api_token
+    env_file: .env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/traefik.yml:/traefik.yml:ro
+      - ./data/acme.json:/acme.json
+      - ./data/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.middlewares.redirect-header.headers.customrequestheaders.X-Forwarded-Proto=https"
+
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.local.xerogravity.space`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth,redirect-header"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.xerogravity.space"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.xerogravity.space"
+      
+secrets:
+  cf_api_token:
+    file: ./cf_api_token.txt
+
+networks:
+  proxy:
+    external: true
