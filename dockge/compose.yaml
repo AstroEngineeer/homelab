@@ -24,9 +24,8 @@ services:
       - "traefik.http.routers.dockge.middlewares=redirect-header@file,whitelisted-ips@file"
       - "traefik.http.routers.dockge.service=dockge"
       - "traefik.http.services.dockge.loadbalancer.server.port=5001"
-    networks:
-      - proxy
 
 networks:
-  proxy:
+  default:
+    name: proxy
     external: true

@@ -15,9 +15,8 @@ services:
       - "traefik.http.routers.uptime-kuma.middlewares=redirect-header@file,whitelisted-ips@file"
       - "traefik.http.routers.uptime-kuma.service=uptime-kuma"
       - "traefik.http.services.uptime-kuma.loadbalancer.server.port=3001"
-    networks:
-      - proxy
 
 networks:
-  proxy:
+  default:
+    name: proxy
     external: true
