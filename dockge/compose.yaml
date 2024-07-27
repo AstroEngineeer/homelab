@@ -11,7 +11,22 @@ services:
       # ⚠️ READ IT CAREFULLY. If you did it wrong, your data could end up writing into a WRONG PATH.
       # ⚠️ 1. FULL path only. No relative path (MUST)
       # ⚠️ 2. Left Stacks Path === Right Stacks Path (MUST)
-      - /home/neo/homelab:/home/neo/homelab
+      - /home/debian/homelab:/home/debian/homelab
     environment:
       # Tell Dockge where to find the stacks
-      - DOCKGE_STACKS_DIR=/home/neo/homelab
+      - DOCKGE_STACKS_DIR=/home/debian/homelab
+    container_name: dockge
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dockge.tls=true"
+      - "traefik.http.routers.dockge.entrypoints=https"
+      - "traefik.http.routers.dockge.rule=Host(`dockge.local.xerogravity.space`)"
+      - "traefik.http.routers.dockge.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.dockge.service=dockge"
+      - "traefik.http.services.dockge.loadbalancer.server.port=5001"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

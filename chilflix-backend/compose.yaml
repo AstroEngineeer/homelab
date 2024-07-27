@@ -4,27 +4,6 @@ networks:
     external: true
 
 services:
-  gluetun:
-    image: qmcgaw/gluetun:latest
-    container_name: gluetun
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    ports:
-      - 8888:8888/tcp # HTTP proxy
-      - 8388:8388/tcp # Shadowsocks
-      - 8388:8388/udp # Shadowsocks
-      - 9696:9696     # prowlarr-a
-    volumes:
-      - ./gluetun:/gluetun
-    environment:
-      - VPN_SERVICE_PROVIDER=protonvpn
-      - FREE_ONLY=on
-    restart: unless-stopped
-    env_file:
-      - gluetun.env
-  
   prowlarr-a:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr-a
@@ -33,11 +12,10 @@ services:
       - PGID=1000
       - TZ=Asia/Kolkata
     volumes:
-      - ./prowlarr-a-config:/config
+      - ./data/prowlarr-a:/config
+    ports:
+      - 9696:9696
     restart: unless-stopped
-    network_mode: service:gluetun
-    depends_on:
-      - gluetun
     
   prowlarr-b:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -47,9 +25,9 @@ services:
       - PGID=1000
       - TZ=Asia/Kolkata
     volumes:
-      - ./prowlarr-b-config:/config
+      - ./data/prowlarr-b:/config
     ports:
-      - 9697:9697
+      - 9697:9696
     restart: unless-stopped
     
   radarr:
@@ -60,7 +38,8 @@ services:
       - PGID=1000
       - TZ=Asia/Kolkata
     volumes:
-      - ./radarr-config:/config
+      - ./data/radarr:/config
+      - /mnt/void/data:/data
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -73,7 +52,8 @@ services:
       - PGID=1000
       - TZ=Asia/Kolkata
     volumes:
-      - ./sonarr-config:/config
+      - ./data/sonarr:/config
+      - /mnt/void/data:/data
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -86,33 +66,41 @@ services:
       - PGID=1000
       - TZ=Asia/Kolkata
     volumes:
-      - ./bazarr-config:/config
+      - ./data/bazarr:/config
+      - /mnt/void/data/media:/data/media
     ports:
       - 6767:6767
     restart: unless-stopped
 
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Kolkata
-      - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
-    volumes:
-      - ./qbittorrent-config:/config
+  arch-qbittorrentvpn:
+    cap_add:
+      - NET_ADMIN
     ports:
       - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
-    restart: unless-stopped
-
+      - 8118:8118
+    container_name: qbittorrent
+    volumes:
+      - /mnt/void/data/torrents:/data/torrents
+      - ./data/qbittorrent:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - VPN_ENABLED=no
+      - ENABLE_SOCKS=no
+      - ENABLE_PRIVOXY=yes
+      - LAN_NETWORK=192.168.0.0/24,172.20.0.0/16
+      - NAME_SERVERS=1.1.1.1,9.9.9.9,1.0.0.1
+      - DEBUG=true
+      - WEBUI_PORT=8080
+      - UMASK=022
+      - PUID=1000
+      - PGID=1000
+    image: binhex/arch-qbittorrentvpn
+  
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=debug
       - LOG_HTML=false
       - CAPTCHA_SOLVER=none
       - TZ=Asia/Kolkata
@@ -125,9 +113,9 @@ services:
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
-      - TZ=Asia/Tashkent
+      - TZ=Asia/Kolkata
     ports:
       - 5055:5055
     volumes:
-      - ./jellyseerr-config:/app/config
+      - ./data/jellyseerr:/app/config
     restart: unless-stopped
