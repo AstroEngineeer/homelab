@@ -5,13 +5,13 @@ services:
     user: 1000:1000
     network_mode: 'host'
     volumes:
-      - ./jellyfin-config:/config
-      - ./jellyfin-cache:/cache
-      - ./media:/media
+      - ./data/config:/config
+      - ./data/cache:/cache
+      - /mnt/void/data/media:/media
     restart: 'unless-stopped'
     # Optional - alternative address used for autodiscovery
     environment:
-      - JELLYFIN_PublishedServerUrl=http://jellyfin.xerogravity.space
+      - JELLYFIN_PublishedServerUrl=http://jellyfin.local.xerogravity.space
     # Optional - may be necessary for docker healthcheck to pass if running in host network mode
     extra_hosts:
       - 'host.docker.internal:host-gateway'

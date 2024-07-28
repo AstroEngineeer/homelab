@@ -1,0 +1,21 @@
+services:
+  notifiarr:
+    container_name: notifiarr
+    hostname: notifiarr
+    image: golift/notifiarr
+    restart: unless-stopped
+    ports:
+      - "5454:5454"
+    volumes:
+      - ./data:/config
+      - /var/run/utmp:/var/run/utmp
+      - /etc/machine-id:/etc/machine-id
+    environment:
+      DN_API_KEY: ${API_KEY}
+    env_file:
+      - .env
+
+networks:
+  default:
+    name: proxy
+    external: true
