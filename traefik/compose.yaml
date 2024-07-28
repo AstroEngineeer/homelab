@@ -9,10 +9,8 @@ services:
       - 80:80
       - 443:443
     environment:
-      CF_DNS_API_TOKEN_FILE: /run/secrets/cf_api_token
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
       TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
-    secrets:
-      - cf_api_token
     env_file: .env
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -34,10 +32,6 @@ services:
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.xerogravity.space"
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.xerogravity.space"
-      
-secrets:
-  cf_api_token:
-    file: ./cf_api_token.txt
 
 networks:
   default:

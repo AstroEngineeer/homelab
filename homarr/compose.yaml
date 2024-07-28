@@ -5,11 +5,21 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./homarr-configs:/app/data/configs
-      - ./homarr-icons:/app/public/icons
-      - ./homarr-data:/data
+      - ./data/configs:/app/data/configs
+      - ./data/icons:/app/public/icons
+      - ./data/data:/data
     ports:
       - '7575:7575'
+    environment:
+      - BASE_URL=homarr.local.xerogravity.space
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homarr.tls=true"
+      - "traefik.http.routers.homarr.entrypoints=https"
+      - "traefik.http.routers.homarr.rule=Host(`homarr.local.xerogravity.space`)"
+      - "traefik.http.routers.homarr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.homarr.service=homarr"
+      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
 
 networks:
   default:
