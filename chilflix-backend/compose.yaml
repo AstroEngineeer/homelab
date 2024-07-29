@@ -115,54 +115,6 @@ services:
       - "traefik.http.routers.sonarr.service=sonarr"
       - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
 
-  bazarr:
-    image: lscr.io/linuxserver/bazarr:latest
-    container_name: bazarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Kolkata
-    volumes:
-      - ./data/bazarr:/config
-      - /mnt/void/data/media:/data/media
-    ports:
-      - 6767:6767
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.bazarr.tls=true"
-      - "traefik.http.routers.bazarr.entrypoints=https"
-      - "traefik.http.routers.bazarr.rule=Host(`bazarr.local.xerogravity.space`)"
-      - "traefik.http.routers.bazarr.middlewares=redirect-header@file,whitelisted-ips@file"
-      - "traefik.http.routers.bazarr.service=bazarr"
-      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
-
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Kolkata
-      - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
-    volumes:
-      - ./data/qbittorrent:/config
-      - /mnt/void/data/torrents:/data/torrents
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.tls=true"
-      - "traefik.http.routers.qbittorrent.entrypoints=https"
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local.xerogravity.space`)"
-      - "traefik.http.routers.qbittorrent.middlewares=redirect-header@file,whitelisted-ips@file"
-      - "traefik.http.routers.qbittorrent.service=qbittorrent"
-      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-  
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
@@ -177,24 +129,3 @@ services:
     networks:
       default:
         ipv4_address: 172.20.0.202
-
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
-    environment:
-      - LOG_LEVEL=debug
-      - TZ=Asia/Kolkata
-    ports:
-      - 5055:5055
-    volumes:
-      - ./data/jellyseerr:/app/config
-      - /mnt/data/media:/data/media
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.jellyseerr.tls=true"
-      - "traefik.http.routers.jellyseerr.entrypoints=https"
-      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.local.xerogravity.space`)"
-      - "traefik.http.routers.jellyseerr.middlewares=redirect-header@file,whitelisted-ips@file"
-      - "traefik.http.routers.jellyseerr.service=jellyseerr"
-      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"

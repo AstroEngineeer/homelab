@@ -1,0 +1,26 @@
+networks:
+  default:
+    name: proxy
+    external: true
+    
+services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Asia/Kolkata
+    ports:
+      - 5055:5055
+    volumes:
+      - ./data:/app/config
+      - /mnt/data/media:/data/media
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyseerr.tls=true"
+      - "traefik.http.routers.jellyseerr.entrypoints=https"
+      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.local.xerogravity.space`)"
+      - "traefik.http.routers.jellyseerr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.jellyseerr.service=jellyseerr"
+      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
