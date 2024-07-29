@@ -14,7 +14,6 @@ services:
       - 5055:5055
     volumes:
       - ./data:/app/config
-      - /mnt/data/media:/data/media
     restart: unless-stopped
     labels:
       - "traefik.enable=true"

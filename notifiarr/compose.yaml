@@ -8,8 +8,9 @@ services:
       - "5454:5454"
     volumes:
       - ./data:/config
-      - /var/run/utmp:/var/run/utmp
-      - /etc/machine-id:/etc/machine-id
+      - ../chilflix-backend/data/radarr/log:/logs/radarr
+      - ../chilflix-backend/data/sonarr/log:/logs/sonarr
+      - ../chilflix-backend/data/prowlarr-a/log:/logs/prowlarr-a
     environment:
       DN_API_KEY: ${API_KEY}
     env_file:
