@@ -13,6 +13,7 @@ services:
       - ../chilflix-backend/data/prowlarr-a/log:/logs/prowlarr-a
     environment:
       DN_API_KEY: ${API_KEY}
+      TZ: Asia/Kolkata
     env_file:
       - .env
     labels:
