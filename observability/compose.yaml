@@ -13,6 +13,9 @@ services:
     command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     networks:
       - monitoring
+    environment:
+      - GRAFANA_CLOUD_API_KEY: ${GRAFANA_CLOUD_API_KEY}
+      - PROMETHEUS_USERNAME: ${PROMETHEUS_USERNAME}
     env_file:
       - .env
 
