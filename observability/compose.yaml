@@ -1,6 +1,6 @@
 networks:
-  monitoring:
-    driver: bridge
+  default:
+    name: monitoring
 
 services:
   alloy:
@@ -11,11 +11,9 @@ services:
       - 12345:12345
     image: grafana/alloy:latest
     command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
-    networks:
-      - monitoring
     environment:
-      - GRAFANA_CLOUD_API_KEY: ${GRAFANA_CLOUD_API_KEY}
-      - PROMETHEUS_USERNAME: ${PROMETHEUS_USERNAME}
+      GRAFANA_CLOUD_API_KEY: ${GRAFANA_CLOUD_API_KEY}
+      PROMETHEUS_USERNAME: ${PROMETHEUS_USERNAME}
     env_file:
       - .env
 
@@ -34,5 +32,18 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     expose:
       - 9100
-    networks:
-      - monitoring
+
+  cadvisor:
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - 8090:8080
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
