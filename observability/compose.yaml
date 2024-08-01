@@ -47,3 +47,17 @@ services:
     devices:
       - /dev/kmsg
     image: gcr.io/cadvisor/cadvisor:v0.49.1
+  
+  dcgm-exporter:
+    container_name: dcgm-exporter
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - 9400:9400
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.7-3.5.0-ubuntu22.04
+    command: curl localhost:9400/metrics

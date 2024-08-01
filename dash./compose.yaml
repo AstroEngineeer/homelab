@@ -20,7 +20,9 @@ services:
       resources:
         reservations:
           devices:
-            - capabilities: [gpu]
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     environment:
       DASHDOT_WIDGET_LIST: os,cpu,storage,ram,network,gpu
       DASHDOT_PORT: 3002
