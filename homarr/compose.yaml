@@ -1,3 +1,8 @@
+networks:
+  default:
+    name: proxy
+    external: true
+    
 services:
   homarr:
     image: ghcr.io/ajnart/homarr:latest
@@ -21,8 +26,3 @@ services:
       - "traefik.http.routers.homarr.middlewares=redirect-header@file,whitelisted-ips@file"
       - "traefik.http.routers.homarr.service=homarr"
       - "traefik.http.services.homarr.loadbalancer.server.port=7575"
-
-networks:
-  default:
-    name: proxy
-    external: true

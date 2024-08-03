@@ -1,3 +1,8 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
 services:
   traefik:
     image: traefik:v3.1.0
@@ -32,8 +37,3 @@ services:
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.xerogravity.space"
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.xerogravity.space"
-
-networks:
-  default:
-    name: proxy
-    external: true
