@@ -1,0 +1,30 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
+services:  
+  prowlarr-a:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr-a
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./data/prowlarr-a:/config
+    restart: unless-stopped
+    network_mode: "container:gluetun"
+    
+  # prowlarr-b:
+  #   image: lscr.io/linuxserver/prowlarr:latest
+  #   container_name: prowlarr-b
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Asia/Kolkata
+  #   volumes:
+  #     - ./data/prowlarr-b:/config
+  #   ports:
+  #     - 9697:9696
+  #   restart: unless-stopped

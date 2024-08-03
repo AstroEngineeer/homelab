@@ -6,8 +6,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/configs:/app/data/configs
-      - ./data/images:/app/public/imgs/custom
+      - ./data/icons:/app/public/icons
       - ./data/data:/data
+      - ./data/images:/app/public/imgs/custom
     ports:
       - '7575:7575'
     environment:

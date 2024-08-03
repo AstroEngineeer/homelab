@@ -1,0 +1,30 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr    
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./data:/config
+      - /mnt/void/data:/data
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    networks:
+      default:
+        ipv4_address: 172.20.0.201
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.tls=true"
+      - "traefik.http.routers.sonarr.entrypoints=https"
+      - "traefik.http.routers.sonarr.rule=Host(`sonarr.local.xerogravity.space`)"
+      - "traefik.http.routers.sonarr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.sonarr.service=sonarr"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"

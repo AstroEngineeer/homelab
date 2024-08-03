@@ -1,0 +1,30 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./data:/config
+      - /mnt/void/data:/data
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    networks:
+      default:
+        ipv4_address: 172.20.0.200
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.tls=true"
+      - "traefik.http.routers.radarr.entrypoints=https"
+      - "traefik.http.routers.radarr.rule=Host(`radarr.local.xerogravity.space`)"
+      - "traefik.http.routers.radarr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.radarr.service=radarr"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
