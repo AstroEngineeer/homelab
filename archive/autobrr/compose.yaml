@@ -30,7 +30,7 @@ services:
       - 9000:9000
     volumes:
       - ./data/thelounge:/var/opt/thelounge
-    restart: always
+    restart: unless-stopped
     image: ghcr.io/thelounge/thelounge:latest
     labels:
       - "traefik.enable=true"
