@@ -2,11 +2,12 @@ services:
   bind9:
     image: internetsystemsconsortium/bind9:9.19
     container_name: bind9
+    network_mode: 'host'
     volumes:
-      - ./bind-config:/etc/bind
-      - /var/cache/bind
-      - /var/lib/bind
-      - /var/log
+      - ./data/config:/etc/bind
+      - ./data/cache:/var/cache/bind
+      - ./data/lib/:/var/lib/bind
+      - ./data/log/:/var/log
     ports:
       - 53:53/udp
       - 53:53/tcp

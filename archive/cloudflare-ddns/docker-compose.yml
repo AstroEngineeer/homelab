@@ -9,5 +9,5 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - ./config.json:/config.json
+      - ./data/config.json:/config.json
     restart: unless-stopped
