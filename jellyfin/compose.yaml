@@ -1,3 +1,8 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
 services:
   jellyfin:
     image: jellyfin/jellyfin
@@ -5,7 +10,8 @@ services:
     user: 1000:1000
     group_add:
       - '105'
-    network_mode: 'host'
+    ports:
+      - 8096:8096
     volumes:
       - ./data/config:/config
       - ./data/cache:/cache
@@ -19,9 +25,11 @@ services:
           devices:
             - capabilities: [gpu]
     restart: 'unless-stopped'
-    # Optional - alternative address used for autodiscovery
-    environment:
-      - JELLYFIN_PublishedServerUrl=http://jellyfin.local.xerogravity.space
-    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.tls=true"
+      - "traefik.http.routers.jellyfin.entrypoints=https"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.local.xerogravity.space`)"
+      - "traefik.http.routers.jellyfin.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.jellyfin.service=jellyfin"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
