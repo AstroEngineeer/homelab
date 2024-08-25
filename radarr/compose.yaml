@@ -25,6 +25,6 @@ services:
       - "traefik.http.routers.radarr.tls=true"
       - "traefik.http.routers.radarr.entrypoints=https"
       - "traefik.http.routers.radarr.rule=Host(`radarr.local.xerogravity.space`)"
-      - "traefik.http.routers.radarr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.radarr.middlewares=secure-middlewares@file"
       - "traefik.http.routers.radarr.service=radarr"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"

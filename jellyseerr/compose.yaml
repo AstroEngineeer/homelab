@@ -20,6 +20,6 @@ services:
       - "traefik.http.routers.jellyseerr.tls=true"
       - "traefik.http.routers.jellyseerr.entrypoints=https"
       - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.local.xerogravity.space`)"
-      - "traefik.http.routers.jellyseerr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.jellyseerr.middlewares=secure-middlewares@file"
       - "traefik.http.routers.jellyseerr.service=jellyseerr"
       - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"

@@ -23,6 +23,6 @@ services:
       - "traefik.http.routers.notifiarr.tls=true"
       - "traefik.http.routers.notifiarr.entrypoints=https"
       - "traefik.http.routers.notifiarr.rule=Host(`notifiarr.local.xerogravity.space`)"
-      - "traefik.http.routers.notifiarr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.notifiarr.middlewares=secure-middlewares@file"
       - "traefik.http.routers.notifiarr.service=notifiarr"
       - "traefik.http.services.notifiarr.loadbalancer.server.port=5454"

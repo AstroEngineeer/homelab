@@ -22,6 +22,6 @@ services:
       - "traefik.http.routers.bazarr.tls=true"
       - "traefik.http.routers.bazarr.entrypoints=https"
       - "traefik.http.routers.bazarr.rule=Host(`bazarr.local.xerogravity.space`)"
-      - "traefik.http.routers.bazarr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.bazarr.middlewares=secure-middlewares@file"
       - "traefik.http.routers.bazarr.service=bazarr"
       - "traefik.http.services.bazarr.loadbalancer.server.port=6767"

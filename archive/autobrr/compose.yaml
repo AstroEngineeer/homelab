@@ -20,7 +20,7 @@ services:
       - "traefik.http.routers.autobrr.tls=true"
       - "traefik.http.routers.autobrr.entrypoints=https"
       - "traefik.http.routers.autobrr.rule=Host(`autobrr.local.xerogravity.space`)"
-      - "traefik.http.routers.autobrr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.autobrr.middlewares=secure-middlewares@file"
       - "traefik.http.routers.autobrr.service=autobrr"
       - "traefik.http.services.autobrr.loadbalancer.server.port=7474"
   
@@ -37,6 +37,6 @@ services:
       - "traefik.http.routers.thelounge.tls=true"
       - "traefik.http.routers.thelounge.entrypoints=https"
       - "traefik.http.routers.thelounge.rule=Host(`thelounge.local.xerogravity.space`)"
-      - "traefik.http.routers.thelounge.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.thelounge.middlewares=secure-middlewares@file"
       - "traefik.http.routers.thelounge.service=thelounge"
       - "traefik.http.services.thelounge.loadbalancer.server.port=9000"

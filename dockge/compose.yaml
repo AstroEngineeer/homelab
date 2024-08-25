@@ -26,6 +26,6 @@ services:
       - "traefik.http.routers.dockge.tls=true"
       - "traefik.http.routers.dockge.entrypoints=https"
       - "traefik.http.routers.dockge.rule=Host(`dockge.local.xerogravity.space`)"
-      - "traefik.http.routers.dockge.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.dockge.middlewares=secure-middlewares@file"
       - "traefik.http.routers.dockge.service=dockge"
       - "traefik.http.services.dockge.loadbalancer.server.port=5001"

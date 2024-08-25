@@ -34,6 +34,6 @@ services:
       - "traefik.http.routers.prowlarr-a.tls=true"
       - "traefik.http.routers.prowlarr-a.entrypoints=https"
       - "traefik.http.routers.prowlarr-a.rule=Host(`prowlarr-a.local.xerogravity.space`)"
-      - "traefik.http.routers.prowlarr-a.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.prowlarr-a.middlewares=secure-middlewares@file"
       - "traefik.http.routers.prowlarr-a.service=prowlarr-a"
       - "traefik.http.services.prowlarr-a.loadbalancer.server.port=9696"

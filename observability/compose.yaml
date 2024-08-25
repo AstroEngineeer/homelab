@@ -16,6 +16,7 @@ services:
       PROMETHEUS_USERNAME: ${PROMETHEUS_USERNAME}
     env_file:
       - .env
+    restart: unless-stopped
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -47,6 +48,7 @@ services:
     devices:
       - /dev/kmsg
     image: gcr.io/cadvisor/cadvisor:v0.49.1
+    restart: unless-stopped
   
   dcgm-exporter:
     container_name: dcgm-exporter
@@ -61,3 +63,4 @@ services:
       - 9400:9400
     image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.7-3.5.0-ubuntu22.04
     command: curl localhost:9400/metrics
+    restart: unless-stopped

@@ -23,6 +23,6 @@ services:
       - "traefik.http.routers.homarr.tls=true"
       - "traefik.http.routers.homarr.entrypoints=https"
       - "traefik.http.routers.homarr.rule=Host(`homarr.local.xerogravity.space`)"
-      - "traefik.http.routers.homarr.middlewares=redirect-header@file,whitelisted-ips@file"
+      - "traefik.http.routers.homarr.middlewares=secure-middlewares@file"
       - "traefik.http.routers.homarr.service=homarr"
       - "traefik.http.services.homarr.loadbalancer.server.port=7575"
