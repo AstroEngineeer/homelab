@@ -14,12 +14,10 @@ services:
       - WEBUI_PORT=8080
       - TORRENTING_PORT=6881
     volumes:
-      - ./data:/config
+      - ./data/qBittorrent:/config
       - /mnt/void/data/torrents:/data/torrents
     ports:
       - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -29,3 +27,29 @@ services:
       - "traefik.http.routers.qbittorrent.middlewares=secure-middlewares@file"
       - "traefik.http.routers.qbittorrent.service=qbittorrent"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+
+  seedbox:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: seedbox
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+      - WEBUI_PORT=8081
+      - TORRENTING_PORT=6881
+    volumes:
+      - ./data/seedbox:/config
+      - /mnt/void/seedbox/torrents:/data/torrents
+    ports:
+      - 8081:8081
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.seedbox.tls=true"
+      - "traefik.http.routers.seedbox.entrypoints=https"
+      - "traefik.http.routers.seedbox.rule=Host(`seedbox.local.xerogravity.space`)"
+      - "traefik.http.routers.seedbox.middlewares=secure-middlewares@file"
+      - "traefik.http.routers.seedbox.service=seedbox"
+      - "traefik.http.services.seedbox.loadbalancer.server.port=8081"
