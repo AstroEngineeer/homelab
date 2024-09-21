@@ -24,10 +24,13 @@ services:
       - "traefik.http.routers.qbittorrent.tls=true"
       - "traefik.http.routers.qbittorrent.entrypoints=https"
       - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local.xerogravity.space`)"
-      - "traefik.http.routers.qbittorrent.middlewares=secure-middlewares@file"
+      - "traefik.http.middlewares.qb-headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.qb-headers.headers.customrequestheaders.Referer="
+      - "traefik.http.middlewares.qb-headers.headers.customrequestheaders.Origin="
+      - "traefik.http.routers.qbittorrent.middlewares=secure-middlewares@file,qb-headers"
       - "traefik.http.routers.qbittorrent.service=qbittorrent"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-
+      - "traefik.http.services.qb.loadbalancer.passhostheader=false"
   seedbox:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: seedbox
@@ -50,6 +53,10 @@ services:
       - "traefik.http.routers.seedbox.tls=true"
       - "traefik.http.routers.seedbox.entrypoints=https"
       - "traefik.http.routers.seedbox.rule=Host(`seedbox.local.xerogravity.space`)"
-      - "traefik.http.routers.seedbox.middlewares=secure-middlewares@file"
+      - "traefik.http.middlewares.sb-headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.sb-headers.headers.customrequestheaders.Referer="
+      - "traefik.http.middlewares.sb-headers.headers.customrequestheaders.Origin="
+      - "traefik.http.routers.seedbox.middlewares=secure-middlewares@file,sb-headers"
       - "traefik.http.routers.seedbox.service=seedbox"
       - "traefik.http.services.seedbox.loadbalancer.server.port=8081"
+      - "traefik.http.services.qb.loadbalancer.passhostheader=false"
