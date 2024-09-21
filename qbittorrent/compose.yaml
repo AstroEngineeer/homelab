@@ -43,6 +43,7 @@ services:
     volumes:
       - ./data/seedbox:/config
       - /mnt/void/seedbox/torrents:/data/torrents
+      - /mnt/void/games:/data/games
     ports:
       - 8081:8081
       - 6881:6881
