@@ -2,12 +2,13 @@ services:
   gamevault-backend:
     image: phalcode/gamevault-backend:latest
     restart: unless-stopped
+    container_name: gamevault-backend
     environment:
       DB_HOST: db
       DB_USERNAME: gamevault
       DB_PASSWORD: ${DB_PASSWORD}
       # Uncomment and insert your RAWG API Key here if you have one (http://rawg.io/login?forward=developer)
-      # RAWG_API_KEY: YOURAPIKEYHERE
+      RAWG_API_KEY: ${RAWG_API_KEY}
     volumes:
       # Mount the folder where your games are
       - /mnt/void/games:/files
@@ -19,6 +20,7 @@ services:
       - .env
   db:
     image: postgres:16
+    container_name: gamevault-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: gamevault
