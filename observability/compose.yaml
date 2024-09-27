@@ -1,6 +1,9 @@
 networks:
   default:
     name: monitoring
+  proxy:
+    name: proxy
+    external: true
 
 services:
   alloy:
@@ -25,6 +28,9 @@ services:
       - "traefik.http.routers.alloy.middlewares=secure-middlewares@file"
       - "traefik.http.routers.alloy.service=alloy"
       - "traefik.http.services.alloy.loadbalancer.server.port=12345"
+    networks:
+      - default
+      - proxy
 
   node-exporter:
     image: prom/node-exporter:latest
