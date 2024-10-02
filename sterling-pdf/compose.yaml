@@ -18,6 +18,7 @@ services:
       - DOCKER_ENABLE_SECURITY=false
       - INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false
       - LANGS=en_GB
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.stirling-pdf.tls=true"
