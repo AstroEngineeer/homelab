@@ -1,0 +1,89 @@
+networks:
+  default:
+    name: rxresume-network
+  proxy:
+    name: proxy
+    external: true
+
+services:
+  postgres:
+    container_name: rxresume-postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=rxresume
+      - POSTGRES_USER=rxresume
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./container_data/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    container_name: rxresume-minio
+    image: minio/minio
+    restart: unless-stopped
+    command: server /data
+    env_file:
+      - .env
+    environment:
+      - MINIO_ROOT_USER=rxresume
+      - MINIO_ROOT_PASSWORD=${STORAGE_PASSWORD}
+    ports:
+      - 9000:9000
+    volumes:
+      - ./container_data/minio/data:/data
+
+  chrome:
+    container_name: rxresume-chrome
+    image: ghcr.io/browserless/chromium:latest
+    restart: unless-stopped
+    environment:
+      CONCURRENT: 10
+      EXIT_ON_HEALTH_FAILURE: true
+      PRE_REQUEST_HEALTH_CHECK: true
+      TIMEOUT: 10000
+      TOKEN: ${CHROME_TOKEN}
+
+  rxresume:
+    container_name: rxresume
+    image: amruthpillai/reactive-resume:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - minio
+      - chrome
+    environment:
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - CHROME_TOKEN=${CHROME_TOKEN}
+      - CHROME_URL=ws://rxresume-chrome:3000
+      - DATABASE_URL=postgresql://rxresume:${DB_PASSWORD}@rxresume-postgres:5432/rxresume
+      - NODE_ENV=production
+      - PORT=3005
+      - PUBLIC_URL=http://rxresume.local.xerogravity.space
+      - STORAGE_URL=http://rxresume-minio:9000/default
+      - STORAGE_ENDPOINT=rxresume-minio
+      - STORAGE_PORT=9000
+      - STORAGE_BUCKET=default
+      - STORAGE_ACCESS_KEY=rxresume
+      - STORAGE_SECRET_KEY=${STORAGE_PASSWORD}
+      - STORAGE_USE_SSL=false
+      - STORAGE_SKIP_BUCKET_CHECK=false
+    ports:
+      - 3005:3005
+    networks:
+      - default
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rxresume.tls=true"
+      - "traefik.http.routers.rxresume.rule=Host(`rxresume.local.xerogravity.space`)"
+      - "traefik.http.routers.rxresume.entrypoints=https"
+      - "traefik.http.routers.rxresume.service=rxresume"
+      - "traefik.http.services.rxresume.loadbalancer.server.port=3005"
