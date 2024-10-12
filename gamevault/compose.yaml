@@ -1,3 +1,7 @@
+networks:
+  default:
+    name: gamevault-network
+
 services:
   gamevault-backend:
     container_name: gamevault-backend
@@ -6,7 +10,7 @@ services:
     env_file:
       - .env
     environment:
-      - DB_HOST=db
+      - DB_HOST=gamevault-postgres
       - DB_USERNAME=gamevault
       - DB_PASSWORD=${DB_PASSWORD}
       - RAWG_API_KEY=${RAWG_API_KEY}
@@ -16,15 +20,16 @@ services:
     volumes:
       - /mnt/void/games:/files
       - ./container_data/gamevault/images:/images
-  db:
-    container_name: gamevault-db
+  
+  postgres:
+    container_name: gamevault-postgres
     image: postgres:16
     restart: unless-stopped
     env_file:
       - .env
     environment:
+      - POSTGRES_DB=gamevault
       - POSTGRES_USER=gamevault
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=gamevault
     volumes:
       - ./container_data/postgres/data:/var/lib/postgresql/data
