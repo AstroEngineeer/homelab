@@ -1,0 +1,23 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
+services:
+  dozzle:
+    container_name: dozzel
+    image: amir20/dozzle:latest
+    environment:
+      - DOZZLE_ADDR=:8083
+      - DOZZLE_HOSTNAME=dozzel.local.xerogravity.space
+    ports:
+      - 8083:8083
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dozzel.tls=true"
+      - "traefik.http.routers.dozzel.rule=Host(`dozzel.local.xerogravity.space`)"
+      - "traefik.http.routers.dozzel.entrypoints=https"
+      - "traefik.http.routers.dozzel.service=dozzel"
+      - "traefik.http.services.dozzel.loadbalancer.server.port=8083"
