@@ -5,35 +5,31 @@ networks:
 
 services:
   traefik:
-    image: traefik:v3.1.4
+    image: traefik:latest
     container_name: traefik
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    env_file: .env
+    environment:
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+      - TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
     ports:
       - 80:80
       - 443:443
-    environment:
-      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
-      TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
-    env_file: .env
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data/traefik.yml:/traefik.yml:ro
-      - ./data/acme.json:/acme.json
-      - ./data/config.yml:/config.yml:ro
+      - ./container_data/traefik/acme.json:/acme.json
+      - ./container_data/traefik/config.yml:/config.yml:ro
+      - ./container_data/traefik/traefik.yml:/traefik.yml:ro
     labels:
       - "traefik.enable=true"
       # Middleware
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
-      # Https
-      - "traefik.http.routers.traefik-secure.tls=true"
-      - "traefik.http.routers.traefik-secure.entrypoints=https"
-      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.local.xerogravity.space`)"
-      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth,redirect-header@file"
-      - "traefik.http.routers.traefik-secure.service=api@internal"
-      # TLS
-      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.xerogravity.space"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.xerogravity.space"
+      - "traefik.http.middlewares.traefik.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      # HTTPS
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.local.xerogravity.space`)"
+      - "traefik.http.routers.traefik.entrypoints=https"
+      - "traefik.http.routers.traefik.middlewares=traefik"
+      - "traefik.http.routers.traefik.service=api@internal"

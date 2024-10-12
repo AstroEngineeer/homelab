@@ -5,8 +5,9 @@ networks:
 
 services:
   jellyfin:
-    image: jellyfin/jellyfin
     container_name: jellyfin
+    image: jellyfin/jellyfin:latest
+    restart: 'unless-stopped'
     user: 1000:1000
     group_add:
       - '105'
@@ -15,9 +16,9 @@ services:
       - 1900:1900/udp
       - 7359:7359/udp
     volumes:
-      - ./data/config:/config
-      - ./data/cache:/cache
       - /mnt/void/data/media:/media
+      - ./container_data/jellyfin/cache:/cache
+      - ./container_data/jellyfin/config:/config
     devices:
       - "/dev/dri/renderD128:/dev/dri/renderD128"
     runtime: nvidia
@@ -26,12 +27,39 @@ services:
         reservations:
           devices:
             - capabilities: [gpu]
-    restart: 'unless-stopped'
     labels:
       - "traefik.enable=true"
+      # middlewares
+      - 'traefik.http.middlewares.jellyfin.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.jellyfin.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.jellyfin.headers.SSLHost=jellyfin.local.xerogravity.space'
+      - 'traefik.http.middlewares.jellyfin.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.jellyfin.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.jellyfin.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.jellyfin.headers.STSPreload=true'
+      - 'traefik.http.middlewares.jellyfin.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.jellyfin.headers.frameDeny=true'
+      - 'traefik.http.middlewares.jellyfin.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.jellyfin.headers.browserXssFilter=true'
+      # router
       - "traefik.http.routers.jellyfin.tls=true"
-      - "traefik.http.routers.jellyfin.entrypoints=https"
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.local.xerogravity.space`)"
-      - "traefik.http.routers.jellyfin.middlewares=secure-middlewares@file"
+      - "traefik.http.routers.jellyfin.entrypoints=https"
+      - "traefik.http.routers.jellyfin.middlewares=jellyfin"
       - "traefik.http.routers.jellyfin.service=jellyfin"
+      # service
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+  
+  jellyfin_vue:
+    container_name: jellyfin_vue
+    image: ghcr.io/jellyfin/jellyfin-vue:unstable
+    restart: unless-stopped
+    ports:
+      - 8097:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin-vue.tls=true"
+      - "traefik.http.routers.jellyfin-vue.rule=Host(`jellyfin-vue.local.xerogravity.space`)"
+      - "traefik.http.routers.jellyfin-vue.entrypoints=https"
+      - "traefik.http.routers.jellyfin-vue.service=jellyfin-vue"
+      - "traefik.http.services.jellyfin-vue.loadbalancer.server.port=8097"

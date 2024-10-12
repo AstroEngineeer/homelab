@@ -5,59 +5,68 @@ networks:
 
 services:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent:latest
+    restart: unless-stopped
     environment:
-      - PUID=1000
       - PGID=1000
+      - PUID=1000
+      - TORRENTING_PORT=6881
       - TZ=Asia/Kolkata
       - WEBUI_PORT=8080
-      - TORRENTING_PORT=6881
-    volumes:
-      - ./data/qBittorrent:/config
-      - /mnt/void/data/torrents:/data/torrents
     ports:
-      - 8080:8080
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.tls=true"
-      - "traefik.http.routers.qbittorrent.entrypoints=https"
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local.xerogravity.space`)"
-      - "traefik.http.middlewares.qb-headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.qb-headers.headers.customrequestheaders.Referer="
-      - "traefik.http.middlewares.qb-headers.headers.customrequestheaders.Origin="
-      - "traefik.http.routers.qbittorrent.middlewares=secure-middlewares@file,qb-headers"
-      - "traefik.http.routers.qbittorrent.service=qbittorrent"
-      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-      - "traefik.http.services.qb.loadbalancer.passhostheader=false"
-  seedbox:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: seedbox
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Kolkata
-      - WEBUI_PORT=8081
-      - TORRENTING_PORT=6881
-    volumes:
-      - ./data/seedbox:/config
-      - /mnt/void/seedbox/torrents:/data/torrents
-      - /mnt/void/games:/data/games
-    ports:
-      - 8081:8081
       - 6881:6881
       - 6881:6881/udp
-    restart: unless-stopped
+      - 8080:8080
+    volumes:
+      - /mnt/void/data/torrents:/data/torrents
+      - ./container_data/qbittorrent/config:/config
     labels:
       - "traefik.enable=true"
+      # middleware
+      - "traefik.http.middlewares.qbittorrent.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Referer="
+      - "traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Origin="
+      # router
+      - "traefik.http.routers.qbittorrent.tls=true"
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local.xerogravity.space`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=https"
+      - "traefik.http.routers.qbittorrent.middlewares=qbittorrent"
+      - "traefik.http.routers.qbittorrent.service=qbittorrent"
+      # service
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+      - "traefik.http.services.qbittorrent.loadbalancer.passhostheader=false"
+  seedbox:
+    container_name: seedbox
+    image: lscr.io/linuxserver/qbittorrent:latest
+    restart: unless-stopped
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TORRENTING_PORT=6882
+      - TZ=Asia/Kolkata
+      - WEBUI_PORT=8081
+    ports:
+      - 6882:6882
+      - 6882:6882/udp
+      - 8081:8081
+    volumes:
+      - /mnt/void/seedbox/torrents:/data/torrents
+      - /mnt/void/games:/data/games
+      - ./container_data/seedbox/config:/config
+
+    labels:
+      - "traefik.enable=true"
+      # middleware
+      - "traefik.http.middlewares.seedbox.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.seedbox.headers.customrequestheaders.Referer="
+      - "traefik.http.middlewares.seedbox.headers.customrequestheaders.Origin="
+      # router
       - "traefik.http.routers.seedbox.tls=true"
-      - "traefik.http.routers.seedbox.entrypoints=https"
       - "traefik.http.routers.seedbox.rule=Host(`seedbox.local.xerogravity.space`)"
-      - "traefik.http.middlewares.sb-headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.sb-headers.headers.customrequestheaders.Referer="
-      - "traefik.http.middlewares.sb-headers.headers.customrequestheaders.Origin="
-      - "traefik.http.routers.seedbox.middlewares=secure-middlewares@file,sb-headers"
+      - "traefik.http.routers.seedbox.entrypoints=https"
+      - "traefik.http.routers.seedbox.middlewares=seedbox"
       - "traefik.http.routers.seedbox.service=seedbox"
+      # service
       - "traefik.http.services.seedbox.loadbalancer.server.port=8081"
-      - "traefik.http.services.qb.loadbalancer.passhostheader=false"
+      - "traefik.http.services.seedbox.loadbalancer.passhostheader=false"

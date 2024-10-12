@@ -5,24 +5,23 @@ networks:
     
 services:
   homarr:
-    image: ghcr.io/ajnart/homarr:latest
     container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
     restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/configs:/app/data/configs
-      - ./data/icons:/app/public/icons
-      - ./data/data:/data
-      - ./data/images:/app/public/imgs/custom
-    ports:
-      - '7575:7575'
     environment:
       - BASE_URL=homarr.local.xerogravity.space
+    ports:
+      - 7575:7575
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./container_data/homarr/configs:/app/data/configs
+      - ./container_data/homarr/data:/data
+      - ./container_data/homarr/icons:/app/public/icons
+      - ./container_data/homarr/imgs:/app/public/imgs/custom
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homarr.tls=true"
-      - "traefik.http.routers.homarr.entrypoints=https"
       - "traefik.http.routers.homarr.rule=Host(`homarr.local.xerogravity.space`)"
-      - "traefik.http.routers.homarr.middlewares=secure-middlewares@file"
+      - "traefik.http.routers.homarr.entrypoints=https"
       - "traefik.http.routers.homarr.service=homarr"
       - "traefik.http.services.homarr.loadbalancer.server.port=7575"

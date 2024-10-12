@@ -5,26 +5,25 @@ networks:
 
 services:
   sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr    
+    image: lscr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
     environment:
-      - PUID=1000
       - PGID=1000
+      - PUID=1000
       - TZ=Asia/Kolkata
-    volumes:
-      - ./data:/config
-      - /mnt/void/data:/data
     ports:
       - 8989:8989
-    restart: unless-stopped
+    volumes:
+      - /mnt/void/data:/data
+      - ./container_data/sonarr/config:/config
     networks:
       default:
         ipv4_address: 172.20.0.201
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sonarr.tls=true"
-      - "traefik.http.routers.sonarr.entrypoints=https"
       - "traefik.http.routers.sonarr.rule=Host(`sonarr.local.xerogravity.space`)"
-      - "traefik.http.routers.sonarr.middlewares=secure-middlewares@file"
+      - "traefik.http.routers.sonarr.entrypoints=https"
       - "traefik.http.routers.sonarr.service=sonarr"
       - "traefik.http.services.sonarr.loadbalancer.server.port=8989"

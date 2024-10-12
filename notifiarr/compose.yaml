@@ -9,20 +9,19 @@ services:
     hostname: notifiarr
     image: golift/notifiarr
     restart: unless-stopped
-    ports:
-      - "5454:5454"
-    volumes:
-      - ./data:/config
-    environment:
-      DN_API_KEY: ${API_KEY}
-      TZ: Asia/Kolkata
     env_file:
       - .env
+    environment:
+      - DN_API_KEY=${API_KEY}
+      - TZ=Asia/Kolkata
+    ports:
+      - 5454:5454
+    volumes:
+      - ./container_data/notifiarr/config:/config
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.notifiarr.tls=true"
-      - "traefik.http.routers.notifiarr.entrypoints=https"
       - "traefik.http.routers.notifiarr.rule=Host(`notifiarr.local.xerogravity.space`)"
-      - "traefik.http.routers.notifiarr.middlewares=secure-middlewares@file"
+      - "traefik.http.routers.notifiarr.entrypoints=https"
       - "traefik.http.routers.notifiarr.service=notifiarr"
       - "traefik.http.services.notifiarr.loadbalancer.server.port=5454"

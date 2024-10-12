@@ -8,38 +8,33 @@ networks:
 services:
   alloy:
     container_name: alloy
-    volumes:
-      - ./data/alloy/config.alloy:/etc/alloy/config.alloy
-    ports:
-      - 12345:12345
     image: grafana/alloy:latest
+    restart: unless-stopped
     command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
-    environment:
-      GRAFANA_CLOUD_API_KEY: ${GRAFANA_CLOUD_API_KEY}
-      PROMETHEUS_USERNAME: ${PROMETHEUS_USERNAME}
     env_file:
       - .env
-    restart: unless-stopped
+    environment:
+      - GRAFANA_CLOUD_API_KEY=${GRAFANA_CLOUD_API_KEY}
+      - PROMETHEUS_USERNAME=${PROMETHEUS_USERNAME}
+    ports:
+      - 12345:12345
+    volumes:
+      - ./container_data/alloy/config.alloy:/etc/alloy/config.alloy
+    networks:
+      - default
+      - proxy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.alloy.tls=true"
       - "traefik.http.routers.alloy.entrypoints=https"
       - "traefik.http.routers.alloy.rule=Host(`alloy.local.xerogravity.space`)"
-      - "traefik.http.routers.alloy.middlewares=secure-middlewares@file"
       - "traefik.http.routers.alloy.service=alloy"
       - "traefik.http.services.alloy.loadbalancer.server.port=12345"
-    networks:
-      - default
-      - proxy
 
   node-exporter:
-    image: prom/node-exporter:latest
     container_name: node-exporter
+    image: prom/node-exporter:latest
     restart: unless-stopped
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
     command:
       - '--path.procfs=/host/proc'
       - '--path.rootfs=/rootfs'
@@ -47,25 +42,34 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     ports:
       - 9100:9100
-
-  cadvisor:
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-    ports:
-      - 8090:8080
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+
+  cadvisor:
     container_name: cadvisor
-    privileged: true
-    devices:
-      - /dev/kmsg
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     restart: unless-stopped
+    privileged: true
+    ports:
+      - 8090:8080
+    volumes:
+      - /:/rootfs:ro
+      - /dev/disk/:/dev/disk:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run:/var/run:ro
+    devices:
+      - /dev/kmsg
   
   dcgm-exporter:
     container_name: dcgm-exporter
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.7-3.5.0-ubuntu22.04
+    restart: unless-stopped
+    command: curl localhost:9400/metrics
+    ports:
+      - 9400:9400
     deploy:
       resources:
         reservations:
@@ -73,8 +77,3 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    ports:
-      - 9400:9400
-    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.7-3.5.0-ubuntu22.04
-    command: curl localhost:9400/metrics
-    restart: unless-stopped

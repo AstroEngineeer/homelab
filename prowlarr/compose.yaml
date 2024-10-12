@@ -5,26 +5,13 @@ networks:
 
 services:  
   prowlarr-a:
-    image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr-a
+    image: lscr.io/linuxserver/prowlarr:latest
+    restart: unless-stopped
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Kolkata
     volumes:
-      - ./data/prowlarr-a:/config
-    restart: unless-stopped
+      - ./container_data/prowlarr-a/config:/config
     network_mode: "container:gluetun"
-    
-  # prowlarr-b:
-  #   image: lscr.io/linuxserver/prowlarr:latest
-  #   container_name: prowlarr-b
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=Asia/Kolkata
-  #   volumes:
-  #     - ./data/prowlarr-b:/config
-  #   ports:
-  #     - 9697:9696
-  #   restart: unless-stopped

@@ -1,33 +1,30 @@
 services:
   gamevault-backend:
+    container_name: gamevault-backend
     image: phalcode/gamevault-backend:latest
     restart: unless-stopped
-    container_name: gamevault-backend
+    env_file:
+      - .env
     environment:
-      DB_HOST: db
-      DB_USERNAME: gamevault
-      DB_PASSWORD: ${DB_PASSWORD}
-      # Uncomment and insert your RAWG API Key here if you have one (http://rawg.io/login?forward=developer)
-      RAWG_API_KEY: ${RAWG_API_KEY}
-    volumes:
-      # Mount the folder where your games are
-      - /mnt/void/games:/files
-      # Mount the folder where GameVault should store its images
-      - ./data/gamevault:/images
+      - DB_HOST=db
+      - DB_USERNAME=gamevault
+      - DB_PASSWORD=${DB_PASSWORD}
+      - RAWG_API_KEY=${RAWG_API_KEY}
+      - SERVER_PORT=8082
     ports:
-      - 8082:8080/tcp
-    env_file:
-      - .env
-  db:
-    image: postgres:16
-    container_name: gamevault-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: gamevault
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: gamevault
+      - 8082:8082/tcp
     volumes:
-      # Mount the folder where your PostgreSQL database files should land
-      - ./data/postgres:/var/lib/postgresql/data
+      - /mnt/void/games:/files
+      - ./container_data/gamevault/images:/images
+  db:
+    container_name: gamevault-db
+    image: postgres:16
+    restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - POSTGRES_USER=gamevault
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=gamevault
+    volumes:
+      - ./container_data/postgres/data:/var/lib/postgresql/data

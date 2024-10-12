@@ -1,0 +1,27 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
+services:
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    ports:
+      - 2001:2001
+    command:
+       - --port=2001
+       - --name=iamfoo
+    labels:
+      - "traefik.enable=true"
+      # middlewares
+      - 'traefik.http.middlewares.whoami-mw.headers.customRequestHeaders.Connection=Upgrade'
+      - 'traefik.http.middlewares.whoami-mw.headers.customRequestHeaders.Upgrade=websocket'
+
+      - "traefik.http.routers.whoami.rule=Host(`whoami.local.xerogravity.space`)"
+      - "traefik.http.routers.whoami.entrypoints=https"
+      - "traefik.http.routers.whoami.middlewares=whoami-mw"
+      - "traefik.http.routers.whoami.service=whoami"
+      - "traefik.http.routers.whoami.tls=true"
+      
+      - "traefik.http.services.whoami.loadbalancer.server.port=2001"
