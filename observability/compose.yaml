@@ -1,6 +1,6 @@
 networks:
   default:
-    name: monitoring
+    name: monitoring-network
   proxy:
     name: proxy
     external: true
