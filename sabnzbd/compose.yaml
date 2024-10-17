@@ -1,0 +1,26 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
+services:
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+    ports:
+      - 8084:8080
+    volumes:
+      - /mnt/void/data/usenets:/data/usenets
+      - ./container_data/sabnzbd/config:/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sabnzbd.tls=true"
+      - "traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.local.xerogravity.space`)"
+      - "traefik.http.routers.sabnzbd.entrypoints=https"
+      - "traefik.http.routers.sabnzbd.service=sabnzbd"
+      - "traefik.http.services.sabnzbd.loadbalancer.server.port=8080"

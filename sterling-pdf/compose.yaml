@@ -23,4 +23,4 @@ services:
       - "traefik.http.routers.stirling-pdf.rule=Host(`stirling-pdf.local.xerogravity.space`)"
       - "traefik.http.routers.stirling-pdf.entrypoints=https"
       - "traefik.http.routers.stirling-pdf.service=stirling-pdf"
-      - "traefik.http.services.stirling-pdf.loadbalancer.server.port=8085"
+      - "traefik.http.services.stirling-pdf.loadbalancer.server.port=8080"
