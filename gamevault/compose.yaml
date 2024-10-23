@@ -3,24 +3,6 @@ networks:
     name: gamevault-network
 
 services:
-  gamevault-backend:
-    container_name: gamevault-backend
-    image: phalcode/gamevault-backend:latest
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      - DB_HOST=gamevault-postgres
-      - DB_USERNAME=gamevault
-      - DB_PASSWORD=${DB_PASSWORD}
-      - RAWG_API_KEY=${RAWG_API_KEY}
-      - SERVER_PORT=8082
-    ports:
-      - 8082:8082/tcp
-    volumes:
-      - /mnt/void/games:/files
-      - ./container_data/gamevault/images:/images
-  
   postgres:
     container_name: gamevault-postgres
     image: postgres:16
@@ -33,3 +15,24 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - ./container_data/postgres/data:/var/lib/postgresql/data
+
+  gamevault-backend:
+    container_name: gamevault-backend
+    image: phalcode/gamevault-backend:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=gamevault-postgres
+      - DB_USERNAME=gamevault
+      - DB_PASSWORD=${DB_PASSWORD}
+      - METADATA_IGDB_CLIENT_ID=${IGDB_CLIENT_ID}
+      - METADATA_IGDB_CLIENT_SECRET=${IGDB_CLIENT_SECRET}
+      - SERVER_PORT=8082
+    ports:
+      - 8082:8082/tcp
+    volumes:
+      - /mnt/void/games:/files
+      - ./container_data/gamevault/media:/media
