@@ -47,12 +47,11 @@ services:
       - TZ=Asia/Kolkata
       - WEBUI_PORT=8081
     ports:
-      - 6882:6882
-      - 6882:6882/udp
+      - 6882:6881
+      - 6882:6881/udp
       - 8081:8081
     volumes:
       - /mnt/void/seedbox/torrents:/data/torrents
-      - /mnt/void/games:/data/games
       - ./container_data/seedbox/config:/config
 
     labels:
