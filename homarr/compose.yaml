@@ -17,7 +17,7 @@ services:
       - ./container_data/homarr/configs:/app/data/configs
       - ./container_data/homarr/data:/data
       - ./container_data/homarr/icons:/app/public/icons
-      - ./container_data/homarr/imgs:/app/public/imgs/custom
+      - ./container_data/homarr/backgrounds:/app/public/imgs/backgrounds
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homarr.tls=true"
