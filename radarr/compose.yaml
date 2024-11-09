@@ -9,6 +9,7 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     restart: unless-stopped
     environment:
+      - DOCKER_MODS=linuxserver/mods:radarr-striptracks
       - PGID=1000
       - PUID=1000
       - TZ=Asia/Kolkata
