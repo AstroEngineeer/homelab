@@ -12,11 +12,11 @@ services:
       - ./container_data/beszel/beszel_data:/beszel_data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.baszel.tls=true"
-      - "traefik.http.routers.baszel.rule=Host(`baszel.local.xerogravity.space`)"
-      - "traefik.http.routers.baszel.entrypoints=https"
-      - "traefik.http.routers.baszel.service=baszel"
-      - "traefik.http.services.baszel.loadbalancer.server.port=8090"
+      - "traefik.http.routers.beszel.tls=true"
+      - "traefik.http.routers.beszel.rule=Host(`beszel.local.xerogravity.space`)"
+      - "traefik.http.routers.beszel.entrypoints=https"
+      - "traefik.http.routers.beszel.service=beszel"
+      - "traefik.http.services.beszel.loadbalancer.server.port=8090"
 
   beszel-agent:
     container_name: beszel-agent
