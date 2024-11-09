@@ -1,0 +1,33 @@
+networks:
+  default:
+    name: proxy
+    external: true
+
+services:
+  beszel:
+    container_name: beszel
+    image: henrygd/beszel
+    restart: unless-stopped
+    volumes:
+      - ./container_data/beszel/beszel_data:/beszel_data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.baszel.tls=true"
+      - "traefik.http.routers.baszel.rule=Host(`baszel.local.xerogravity.space`)"
+      - "traefik.http.routers.baszel.entrypoints=https"
+      - "traefik.http.routers.baszel.service=baszel"
+      - "traefik.http.services.baszel.loadbalancer.server.port=8090"
+
+  beszel-agent:
+    container_name: beszel-agent
+    image: henrygd/beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /mnt/void/.beszel:/extra-filesystems/sdb:ro
+      - ~/.beszel:/extra-filesystems/sda:ro
+    environment:
+      PORT: 45876
+      KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBs3mXDSnUrDLtf6UgCR8p+csyaxTAZFw+QjwXHz5lI1'
+      FILESYSTEM: /dev/sda2
