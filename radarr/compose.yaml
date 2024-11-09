@@ -12,8 +12,6 @@ services:
       - PGID=1000
       - PUID=1000
       - TZ=Asia/Kolkata
-    ports:
-      - 7878:7878
     volumes:
       - /mnt/void/data:/data
       - ./container_data/radarr/config:/config

@@ -5,17 +5,15 @@ networks:
 
 services:
   dockge:
+    container_name: dockge
     image: louislam/dockge:1
     restart: unless-stopped
-    ports:
-      - 5001:5001
+    environment:
+      - DOCKGE_STACKS_DIR=/home/debian/homelab
     volumes:
       - /home/debian/homelab:/home/debian/homelab
       - /var/run/docker.sock:/var/run/docker.sock
       - ./container_data/dockge/data:/app/data
-    environment:
-      - DOCKGE_STACKS_DIR=/home/debian/homelab
-    container_name: dockge
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dockge.tls=true"

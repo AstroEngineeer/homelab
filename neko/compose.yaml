@@ -6,19 +6,22 @@ networks:
 services:
   neko:
     container_name: neko
-    image: "m1k1o/neko:firefox"
-    restart: "unless-stopped"
-    shm_size: "2gb"
+    image: m1k1o/neko:firefox
+    restart: unless-stopped
+    shm_size: 2gb
     ports:
-      - 8086:8080
-      - "51000-51100:51000-51100/udp"
+      - 8080:8080
+      - 52000-52100:52000-52100/udp
     env_file:
       - .env
+    volumes:
+      - ./container_data/neko/firefox:/home/neko/.mozilla/firefox/profile.default
     environment:
-      NEKO_SCREEN: '1920x1080@30'
+      NEKO_SCREEN: '1920x1080@60'
       NEKO_PASSWORD: ${PASSWORD}
       NEKO_PASSWORD_ADMIN: ${ADMIN_PASSWORD}
-      NEKO_EPR: 51000-51100
+      NEKO_EPR: 52000-52100
+      # NEKO_BIND: ":8081"
       NEKO_NAT1TO1: 192.168.18.2
     labels:
       - "traefik.enable=true"

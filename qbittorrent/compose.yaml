@@ -14,10 +14,7 @@ services:
       - TORRENTING_PORT=6881
       - TZ=Asia/Kolkata
       - WEBUI_PORT=8080
-    ports:
-      - 6881:6881
-      - 6881:6881/udp
-      - 8080:8080
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
     volumes:
       - /mnt/void/data/torrents:/data/torrents
       - ./container_data/qbittorrent/config:/config
@@ -36,6 +33,7 @@ services:
       # service
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
       - "traefik.http.services.qbittorrent.loadbalancer.passhostheader=false"
+  
   seedbox:
     container_name: seedbox
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -43,17 +41,12 @@ services:
     environment:
       - PGID=1000
       - PUID=1000
-      - TORRENTING_PORT=6882
+      - TORRENTING_PORT=6881
       - TZ=Asia/Kolkata
-      - WEBUI_PORT=8081
-    ports:
-      - 6882:6881
-      - 6882:6881/udp
-      - 8081:8081
+      - WEBUI_PORT=8080
     volumes:
       - /mnt/void/seedbox/torrents:/data/torrents
       - ./container_data/seedbox/config:/config
-
     labels:
       - "traefik.enable=true"
       # middleware
@@ -67,5 +60,5 @@ services:
       - "traefik.http.routers.seedbox.middlewares=seedbox"
       - "traefik.http.routers.seedbox.service=seedbox"
       # service
-      - "traefik.http.services.seedbox.loadbalancer.server.port=8081"
+      - "traefik.http.services.seedbox.loadbalancer.server.port=8080"
       - "traefik.http.services.seedbox.loadbalancer.passhostheader=false"

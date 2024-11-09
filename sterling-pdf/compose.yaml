@@ -8,8 +8,6 @@ services:
     container_name: stirling-pdf
     image: frooodle/s-pdf:latest
     restart: unless-stopped
-    ports:
-      - 8085:8080
     volumes:
       - ./container_data/stirling-pdf/tessdata:/usr/share/tessdata
       - ./container_data/stirling-pdf/configs:/configs

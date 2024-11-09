@@ -12,8 +12,6 @@ services:
       - PGID=1000
       - PUID=1000
       - TZ=Asia/Kolkata
-    ports:
-      - 8989:8989
     volumes:
       - /mnt/void/data:/data
       - ./container_data/sonarr/config:/config

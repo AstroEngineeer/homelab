@@ -8,10 +8,6 @@ services:
     container_name: homarr
     image: ghcr.io/ajnart/homarr:latest
     restart: unless-stopped
-    environment:
-      - BASE_URL=homarr.local.xerogravity.space
-    ports:
-      - 7575:7575
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./container_data/homarr/configs:/app/data/configs

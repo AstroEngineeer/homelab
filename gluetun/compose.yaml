@@ -16,7 +16,6 @@ services:
       - 8888:8888/tcp # HTTP proxy
       - 8388:8388/tcp # Shadowsocks
       - 8388:8388/udp # Shadowsocks
-      - 9696:9696     # prowlarr-a
     volumes:
       - ./container_data/gluetun/gluetun:/gluetun
     cap_add:
@@ -24,13 +23,13 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     extra_hosts:
-      - flaresolverr:172.20.0.202
       - radarr:172.20.0.200
       - sonarr:172.20.0.201
+      - flaresolverr:172.20.0.202
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr-a.tls=true"
-      - "traefik.http.routers.prowlarr-a.rule=Host(`prowlarr-a.local.xerogravity.space`)"
-      - "traefik.http.routers.prowlarr-a.entrypoints=https"
-      - "traefik.http.routers.prowlarr-a.service=prowlarr-a"
-      - "traefik.http.services.prowlarr-a.loadbalancer.server.port=9696"
+      - "traefik.http.routers.prowlarr.tls=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.local.xerogravity.space`)"
+      - "traefik.http.routers.prowlarr.entrypoints=https"
+      - "traefik.http.routers.prowlarr.service=prowlarr"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"

@@ -13,8 +13,6 @@ services:
       - LOG_LEVEL=debug
       - LOG_HTML=false
       - TZ=Asia/Kolkata
-    ports:
-      - 8191:8191
     networks:
       default:
         ipv4_address: 172.20.0.202

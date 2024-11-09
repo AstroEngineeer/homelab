@@ -75,8 +75,6 @@ services:
       - STORAGE_SECRET_KEY=${STORAGE_PASSWORD}
       - STORAGE_USE_SSL=false
       - STORAGE_SKIP_BUCKET_CHECK=false
-    ports:
-      - 3005:3005
     networks:
       - default
       - proxy

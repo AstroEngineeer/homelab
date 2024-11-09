@@ -14,8 +14,6 @@ services:
     environment:
       - DN_API_KEY=${API_KEY}
       - TZ=Asia/Kolkata
-    ports:
-      - 5454:5454
     volumes:
       - ./container_data/notifiarr/config:/config
     labels:

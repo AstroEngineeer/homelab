@@ -1,6 +1,9 @@
 networks:
   default:
     name: gamevault-network
+  proxy:
+    name: proxy
+    external: true
 
 services:
   postgres:
@@ -30,9 +33,16 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - METADATA_IGDB_CLIENT_ID=${IGDB_CLIENT_ID}
       - METADATA_IGDB_CLIENT_SECRET=${IGDB_CLIENT_SECRET}
-      - SERVER_PORT=8082
-    ports:
-      - 8082:8082/tcp
+    networks:
+      - default
+      - proxy
     volumes:
       - /mnt/void/games:/files
       - ./container_data/gamevault/media:/media
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gamevault.tls=true"
+      - "traefik.http.routers.gamevault.rule=Host(`gamevault.local.xerogravity.space`)"
+      - "traefik.http.routers.gamevault.entrypoints=https"
+      - "traefik.http.routers.gamevault.service=gamevault"
+      - "traefik.http.services.gamevault.loadbalancer.server.port=8080"

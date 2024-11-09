@@ -11,10 +11,7 @@ services:
     user: 1000:1000
     group_add:
       - '105'
-    ports:
-      - 8096:8096
-      - 1900:1900/udp
-      - 7359:7359/udp
+    network_mode: host
     volumes:
       - /mnt/void/data/media:/media
       - ./container_data/jellyfin/cache:/cache
@@ -49,17 +46,3 @@ services:
       - "traefik.http.routers.jellyfin.service=jellyfin"
       # service
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
-  
-  # jellyfin-vue:
-  #   container_name: jellyfin-vue
-  #   image: ghcr.io/jellyfin/jellyfin-vue:unstable
-  #   restart: unless-stopped
-  #   ports:
-  #     - 8097:80
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.jellyfin-vue.tls=true"
-  #     - "traefik.http.routers.jellyfin-vue.rule=Host(`jellyfin-vue.local.xerogravity.space`)"
-  #     - "traefik.http.routers.jellyfin-vue.entrypoints=https"
-  #     - "traefik.http.routers.jellyfin-vue.service=jellyfin-vue"
-  #     - "traefik.http.services.jellyfin-vue.loadbalancer.server.port=8097"

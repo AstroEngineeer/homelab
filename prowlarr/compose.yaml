@@ -4,8 +4,8 @@ networks:
     external: true
 
 services:  
-  prowlarr-a:
-    container_name: prowlarr-a
+  prowlarr:
+    container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
     restart: unless-stopped
     environment:
@@ -13,5 +13,5 @@ services:
       - PGID=1000
       - TZ=Asia/Kolkata
     volumes:
-      - ./container_data/prowlarr-a/config:/config
+      - ./container_data/prowlarr/config:/config
     network_mode: "container:gluetun"
