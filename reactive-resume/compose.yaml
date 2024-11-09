@@ -34,8 +34,6 @@ services:
     environment:
       - MINIO_ROOT_USER=rxresume
       - MINIO_ROOT_PASSWORD=${STORAGE_PASSWORD}
-    ports:
-      - 9000:9000
     volumes:
       - ./container_data/minio/data:/data
 
