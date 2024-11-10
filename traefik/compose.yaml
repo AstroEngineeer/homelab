@@ -27,9 +27,15 @@ services:
       - "traefik.enable=true"
       # Middleware
       - "traefik.http.middlewares.traefik.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
-      # HTTPS
-      - "traefik.http.routers.traefik.tls=true"
+      # HTTP ROUTER
       - "traefik.http.routers.traefik.rule=Host(`traefik.local.xerogravity.space`)"
       - "traefik.http.routers.traefik.entrypoints=https"
       - "traefik.http.routers.traefik.middlewares=traefik"
       - "traefik.http.routers.traefik.service=api@internal"
+      # HTTP TLS
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik.tls.domains[0].main=local.xerogravity.space"
+      - "traefik.http.routers.traefik.tls.domains[0].sans=*.local.xerogravity.space"
+      - "traefik.http.routers.traefik.tls.domains[1].main=ts.xerogravity.space"
+      - "traefik.http.routers.traefik.tls.domains[1].sans=*.ts.xerogravity.space"

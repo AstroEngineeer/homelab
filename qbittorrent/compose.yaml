@@ -26,7 +26,7 @@ services:
       - "traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Origin="
       # router
       - "traefik.http.routers.qbittorrent.tls=true"
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local.xerogravity.space`)"
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local.xerogravity.space`) || Host(`qbittorrent.ts.xerogravity.space`)"
       - "traefik.http.routers.qbittorrent.entrypoints=https"
       - "traefik.http.routers.qbittorrent.middlewares=qbittorrent"
       - "traefik.http.routers.qbittorrent.service=qbittorrent"

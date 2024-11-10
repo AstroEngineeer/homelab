@@ -22,7 +22,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sonarr.tls=true"
-      - "traefik.http.routers.sonarr.rule=Host(`sonarr.local.xerogravity.space`)"
+      - "traefik.http.routers.sonarr.rule=Host(`sonarr.local.xerogravity.space`) || Host(`sonarr.ts.xerogravity.space`)"
       - "traefik.http.routers.sonarr.entrypoints=https"
       - "traefik.http.routers.sonarr.service=sonarr"
       - "traefik.http.services.sonarr.loadbalancer.server.port=8989"

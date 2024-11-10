@@ -1,8 +1,3 @@
-networks:
-  default:
-    name: proxy
-    external: true
-
 services:
   jellyfin:
     container_name: jellyfin
@@ -24,25 +19,3 @@ services:
         reservations:
           devices:
             - capabilities: [gpu]
-    labels:
-      - "traefik.enable=true"
-      # middlewares
-      - 'traefik.http.middlewares.jellyfin.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
-      - 'traefik.http.middlewares.jellyfin.headers.SSLRedirect=true'
-      - 'traefik.http.middlewares.jellyfin.headers.SSLHost=jellyfin.local.xerogravity.space'
-      - 'traefik.http.middlewares.jellyfin.headers.SSLForceHost=true'
-      - 'traefik.http.middlewares.jellyfin.headers.STSSeconds=315360000'
-      - 'traefik.http.middlewares.jellyfin.headers.STSIncludeSubdomains=true'
-      - 'traefik.http.middlewares.jellyfin.headers.STSPreload=true'
-      - 'traefik.http.middlewares.jellyfin.headers.forceSTSHeader=true'
-      - 'traefik.http.middlewares.jellyfin.headers.frameDeny=true'
-      - 'traefik.http.middlewares.jellyfin.headers.contentTypeNosniff=true'
-      - 'traefik.http.middlewares.jellyfin.headers.browserXssFilter=true'
-      # router
-      - "traefik.http.routers.jellyfin.tls=true"
-      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.local.xerogravity.space`)"
-      - "traefik.http.routers.jellyfin.entrypoints=https"
-      - "traefik.http.routers.jellyfin.middlewares=jellyfin"
-      - "traefik.http.routers.jellyfin.service=jellyfin"
-      # service
-      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
