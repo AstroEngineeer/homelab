@@ -1,6 +1,9 @@
 networks:
   default:
     name: mediafusion-network
+  proxy:
+    name: proxy
+    external: true
 
 services:
   mediafusion:
@@ -19,6 +22,10 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    networks:
+      default:
+      proxy:
+        ipv4_address: 172.20.0.203
 
   mongodb:
     container_name: mediafusion-mongodb

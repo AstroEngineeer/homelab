@@ -26,6 +26,7 @@ services:
       - radarr:172.20.0.200
       - sonarr:172.20.0.201
       - flaresolverr:172.20.0.202
+      - mediafusion:172.20.0.203
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prowlarr.tls=true"
