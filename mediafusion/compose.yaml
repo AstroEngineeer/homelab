@@ -1,9 +1,6 @@
 networks:
   default:
     name: mediafusion-network
-  proxy:
-    name: proxy
-    external: true
 
 services:
   mediafusion:
@@ -22,16 +19,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
-    networks:
-      - default
-      - proxy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mediafusion.tls=true"
-      - "traefik.http.routers.mediafusion.rule=Host(`mediafusion.local.xerogravity.space`)"
-      - "traefik.http.routers.mediafusion.entrypoints=https"
-      - "traefik.http.routers.mediafusion.service=mediafusion"
-      - "traefik.http.services.mediafusion.loadbalancer.server.port=8000"
 
   mongodb:
     container_name: mediafusion-mongodb
