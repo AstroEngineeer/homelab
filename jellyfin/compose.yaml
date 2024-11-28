@@ -19,3 +19,21 @@ services:
         reservations:
           devices:
             - capabilities: [gpu]
+  download-optimizer:
+    container_name: jellyfin-download-optimizer
+    image: fredrikburmester/streamyfin-optimized-versions-server:master
+    environment:
+      - NODE_ENV=development
+      - JELLYFIN_URL=https://jellyfin.local.xerogravity.space
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+     - ./container_data/download-optimizer:/usr/src/app/cache
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin-optimizer.tls=true"
+      - "traefik.http.routers.jellyfin-optimizer.rule=Host(`jellyfin-optimizer.local.xerogravity.space`) || Host(`jellyfin-optimizer.ts.xerogravity.space`)"
+      - "traefik.http.routers.jellyfin-optimizer.entrypoints=https"
+      - "traefik.http.routers.jellyfin-optimizer.service=jellyfin-optimizer"
+      - "traefik.http.services.jellyfin-optimizer.loadbalancer.server.port=3000"
