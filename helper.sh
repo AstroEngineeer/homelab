@@ -26,3 +26,7 @@ create_network "tk-proxy" "bridge" "172.18.0.1" "172.18.0.0/16"
 
 # Create ts-proxy network
 create_network "ts-proxy" "bridge" "172.19.0.1" "172.19.0.0/16"
+
+# List all Docker networks
+echo -e "\nListing all Docker networks:"
+docker network ls
