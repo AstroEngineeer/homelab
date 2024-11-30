@@ -7,9 +7,13 @@ services:
   qbittorrentvpn:
     image: binhex/arch-qbittorrentvpn
     container_name: qbittorrentvpn
-    privileged: true
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    # privileged: true
+    # sysctls:
+    #   - net.ipv4.conf.all.src_valid_mark=1
     ports:
       # - 8118:8118 # privoxy
       # - 9118:9118 # microsocks
@@ -19,14 +23,18 @@ services:
       - /mnt/void/data/torrents:/data/torrents
       - ./container_data/qbittorrentvpn/config:/config
       - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
     environment:
       VPN_ENABLED: yes
+      VPN_USER: ${VPN_USER}
+      VPN_PASS: ${VPN_PASS}
       VPN_PROV: protonvpn
-      VPN_CLIENT: wireguard
+      VPN_CLIENT: openvpn
       # VPN_OPTIONS: <additional_openvpn_cli_options>
       ENABLE_STARTUP_SCRIPTS: no
       ENABLE_PRIVOXY: no
-      STRICT_PORT_FORWARD: no
+      STRICT_PORT_FORWARD: yes
       USERSPACE_WIREGUARD: no
       ENABLE_SOCKS: no
       # SOCKS_USER: <socks_username>
@@ -35,11 +43,11 @@ services:
       NAME_SERVERS: 84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1
       VPN_INPUT_PORTS: 8080,8191,9696,7878,8989 # qbt,flaresolverr,powlarr,radarr,sonarr
       # VPN_OUTPUT_PORTS: <port number(s)>
-      DEBUG: true
+      DEBUG: false
       WEBUI_PORT: 8080
-      # UMASK: 000
-      # PUID: <user_id>
-      # PGID: <group_id>
+      UMASK: 000
+      PUID: 1000
+      PGID: 1000
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
