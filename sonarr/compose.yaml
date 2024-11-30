@@ -1,6 +1,6 @@
 networks:
   default:
-    name: proxy
+    name: tk-proxy
     external: true
 
 services:
@@ -18,7 +18,7 @@ services:
       - ./container_data/sonarr/config:/config
     networks:
       default:
-        ipv4_address: 172.20.0.201
+        ipv4_address: 172.18.0.201
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sonarr.tls=true"

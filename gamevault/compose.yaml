@@ -1,8 +1,8 @@
 networks:
   default:
     name: gamevault-network
-  proxy:
-    name: proxy
+  tk-proxy:
+    name: tk-proxy
     external: true
 
 services:
@@ -35,7 +35,7 @@ services:
       - METADATA_IGDB_CLIENT_SECRET=${IGDB_CLIENT_SECRET}
     networks:
       - default
-      - proxy
+      - tk-proxy
     volumes:
       - /mnt/void/games:/files
       - ./container_data/gamevault/media:/media

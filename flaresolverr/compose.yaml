@@ -1,6 +1,6 @@
 networks:
   default:
-    name: proxy
+    name: tk-proxy
     external: true
 
 services: 
@@ -15,4 +15,4 @@ services:
       - TZ=Asia/Kolkata
     networks:
       default:
-        ipv4_address: 172.20.0.202
+        ipv4_address: 172.18.0.202

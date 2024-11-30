@@ -1,8 +1,8 @@
 networks:
   default:
     name: rxresume-network
-  proxy:
-    name: proxy
+  tk-proxy:
+    name: tk-proxy
     external: true
 
 services:
@@ -75,7 +75,7 @@ services:
       - STORAGE_SKIP_BUCKET_CHECK=false
     networks:
       - default
-      - proxy
+      - tk-proxy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.rxresume.tls=true"

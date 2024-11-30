@@ -1,8 +1,8 @@
 networks:
   default:
     name: monitoring-network
-  proxy:
-    name: proxy
+  tk-proxy:
+    name: tk-proxy
     external: true
 
 services:
@@ -22,7 +22,7 @@ services:
       - ./container_data/alloy/config.alloy:/etc/alloy/config.alloy
     networks:
       - default
-      - proxy
+      - tk-proxy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.alloy.tls=true"

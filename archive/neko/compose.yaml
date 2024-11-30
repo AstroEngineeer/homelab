@@ -1,6 +1,6 @@
 networks:
   default:
-    name: proxy
+    name: tk-proxy
     external: true
 
 services:
@@ -21,7 +21,6 @@ services:
       NEKO_PASSWORD: ${PASSWORD}
       NEKO_PASSWORD_ADMIN: ${ADMIN_PASSWORD}
       NEKO_EPR: 52000-52100
-      # NEKO_BIND: ":8081"
       NEKO_NAT1TO1: 192.168.18.2
     labels:
       - "traefik.enable=true"

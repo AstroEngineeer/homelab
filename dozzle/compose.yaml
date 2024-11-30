@@ -1,6 +1,6 @@
 networks:
   default:
-    name: proxy
+    name: tk-proxy
     external: true
 
 services:
@@ -9,7 +9,6 @@ services:
     image: amir20/dozzle:latest
     restart: unless-stopped
     environment:
-      # - DOZZLE_ADDR=:8083
       - DOZZLE_HOSTNAME=dozzel.local.xerogravity.space
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

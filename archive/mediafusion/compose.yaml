@@ -1,8 +1,8 @@
 networks:
   default:
     name: mediafusion-network
-  proxy:
-    name: proxy
+  tk-proxy:
+    name: tk-proxy
     external: true
 
 services:
@@ -24,7 +24,7 @@ services:
       start_period: 10s
     networks:
       default:
-      proxy:
+      tk-proxy:
         ipv4_address: 172.20.0.203
 
   mongodb:

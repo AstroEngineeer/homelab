@@ -1,6 +1,6 @@
 networks:
   default:
-    name: proxy
+    name: tk-proxy
     external: true
 
 services:
@@ -12,10 +12,6 @@ services:
       - TZ=Asia/Kolkata
       - VPN_SERVICE_PROVIDER=custom
       - VPN_TYPE=wireguard
-    ports:
-      - 8888:8888/tcp # HTTP proxy
-      - 8388:8388/tcp # Shadowsocks
-      - 8388:8388/udp # Shadowsocks
     volumes:
       - ./container_data/gluetun/gluetun:/gluetun
     cap_add:
@@ -23,10 +19,9 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     extra_hosts:
-      - radarr:172.20.0.200
-      - sonarr:172.20.0.201
-      - flaresolverr:172.20.0.202
-      - mediafusion:172.20.0.203
+      - radarr:172.18.0.200
+      - sonarr:172.18.0.201
+      - flaresolverr:172.18.0.202
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prowlarr.tls=true"

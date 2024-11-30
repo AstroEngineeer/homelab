@@ -1,15 +1,22 @@
 networks:
   default:
-    name: proxy
+    name: beszel-network
+  tk-proxy:
+    name: tk-proxy
     external: true
 
 services:
   beszel:
     container_name: beszel
-    image: henrygd/beszel
+    image: henrygd/beszel:latest
     restart: unless-stopped
     volumes:
       - ./container_data/beszel/beszel_data:/beszel_data
+    ports:
+      - 8090:8090
+    networks:
+      - default
+      - tk-proxy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.beszel.tls=true"
@@ -26,8 +33,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /mnt/void/.beszel:/extra-filesystems/sdb:ro
-      - ~/.beszel:/extra-filesystems/sda:ro
+    env_file:
+      - .env
     environment:
-      PORT: 45876
-      KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBs3mXDSnUrDLtf6UgCR8p+csyaxTAZFw+QjwXHz5lI1'
-      FILESYSTEM: /dev/sda2
+      - "KEY=${SSH_KEY}"

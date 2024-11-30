@@ -1,0 +1,16 @@
+networks:
+  default:
+    name: ts-proxy
+    external: true
+
+services:
+  tailscale-docker-proxy:
+    image: almeidapaulopt/tsdproxy:1.0.0-rc2
+    container_name: tailscale-docker-proxy
+    ports:
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./container_data/tsdproxy/data:/data
+      - ./container_data/tsdproxy/config:/config
+    restart: unless-stopped

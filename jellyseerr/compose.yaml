@@ -1,6 +1,6 @@
 networks:
   default:
-    name: proxy
+    name: tk-proxy
     external: true
     
 services:
@@ -11,8 +11,6 @@ services:
     environment:
       - LOG_LEVEL=debug
       - TZ=Asia/Kolkata
-    ports:
-      - 5055:5055
     volumes:
       - ./container_data/jellyseerr/config:/app/config
     labels:
