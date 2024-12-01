@@ -18,7 +18,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.stirling-pdf.tls=true"
-      - "traefik.http.routers.stirling-pdf.rule=Host(`stirling-pdf.local.xerogravity.space`) || Host(`stirling-pdf.ts.xerogravity.space`)"
+      - "traefik.http.routers.stirling-pdf.rule=Host(`stirling-pdf.local.xerogravity.space`) || Host(`stirling-pdf.ts.xerogravity.space`) || Host(`stirling-pdf.cf.xerogravity.space`)"
       - "traefik.http.routers.stirling-pdf.entrypoints=https"
       - "traefik.http.routers.stirling-pdf.service=stirling-pdf"
       - "traefik.http.services.stirling-pdf.loadbalancer.server.port=8080"

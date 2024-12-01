@@ -79,7 +79,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.rxresume.tls=true"
-      - "traefik.http.routers.rxresume.rule=Host(`rxresume.local.xerogravity.space`)"
+      - "traefik.http.routers.rxresume.rule=Host(`rxresume.local.xerogravity.space`) || Host(`rxresume.ts.xerogravity.space`) || Host(`rxresume.cf.xerogravity.space`)"
       - "traefik.http.routers.rxresume.entrypoints=https"
       - "traefik.http.routers.rxresume.service=rxresume"
       - "traefik.http.services.rxresume.loadbalancer.server.port=3005"

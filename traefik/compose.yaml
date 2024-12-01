@@ -39,3 +39,5 @@ services:
       - "traefik.http.routers.traefik.tls.domains[0].sans=*.local.xerogravity.space"
       - "traefik.http.routers.traefik.tls.domains[1].main=ts.xerogravity.space"
       - "traefik.http.routers.traefik.tls.domains[1].sans=*.ts.xerogravity.space"
+      - "traefik.http.routers.traefik.tls.domains[2].main=cf.xerogravity.space"
+      - "traefik.http.routers.traefik.tls.domains[2].sans=*.cf.xerogravity.space"
