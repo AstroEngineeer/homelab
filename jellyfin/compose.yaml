@@ -46,8 +46,3 @@ services:
       - "traefik.http.routers.jellyfin.middlewares=jellyfin"
       - "traefik.http.routers.jellyfin.service=jellyfin"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
-      # tailscale proxy
-      - "tsdproxy.enable=true"
-      - "tsdproxy.name=jellyfin"
-      - "tsdproxy.container_port=8096"
-      - "tsdproxy.funnel=false"
