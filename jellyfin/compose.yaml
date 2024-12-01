@@ -2,9 +2,6 @@ networks:
   tk-proxy:
     name: tk-proxy
     external: true
-  ts-proxy:
-    name: tk-proxy
-    external: true
 
 services:
   jellyfin:
@@ -16,7 +13,6 @@ services:
       - '105'
     networks:
       - tk-proxy
-      - ts-proxy
     volumes:
       - /mnt/void/data/media:/media
       - ./container_data/jellyfin/cache:/cache
