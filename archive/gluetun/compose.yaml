@@ -13,7 +13,7 @@ services:
       - VPN_SERVICE_PROVIDER=custom
       - VPN_TYPE=wireguard
     volumes:
-      - ./container_data/gluetun/gluetun:/gluetun
+      - ./container_data/gluetun/gluetun:/gluetun # place wire gaurd config inside /gluetun/wiregaurd/wg0.config
     cap_add:
       - NET_ADMIN
     devices:
