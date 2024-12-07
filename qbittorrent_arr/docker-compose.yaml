@@ -64,19 +64,19 @@ services:
       - "traefik.http.services.qbittorrent.loadbalancer.passhostheader=false"
       # ---prowlarr---
       - "traefik.http.routers.prowlarr.tls=true"
-      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.local.xerogravity.space`)"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.local.xerogravity.space`) || Host(`prowlarr.ts.xerogravity.space`)"
       - "traefik.http.routers.prowlarr.entrypoints=https"
       - "traefik.http.routers.prowlarr.service=prowlarr"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
       # ---radarr---
       - "traefik.http.routers.radarr.tls=true"
-      - "traefik.http.routers.radarr.rule=Host(`radarr.local.xerogravity.space`)"
+      - "traefik.http.routers.radarr.rule=Host(`radarr.local.xerogravity.space`) || Host(`radarr.ts.xerogravity.space`)"
       - "traefik.http.routers.radarr.entrypoints=https"
       - "traefik.http.routers.radarr.service=radarr"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
       # ---sonarr---
       - "traefik.http.routers.sonarr.tls=true"
-      - "traefik.http.routers.sonarr.rule=Host(`sonarr.local.xerogravity.space`)"
+      - "traefik.http.routers.sonarr.rule=Host(`sonarr.local.xerogravity.space`) || Host(`sonarr.ts.xerogravity.space`)"
       - "traefik.http.routers.sonarr.entrypoints=https"
       - "traefik.http.routers.sonarr.service=sonarr"
       - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
