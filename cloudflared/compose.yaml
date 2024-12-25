@@ -1,7 +1,0 @@
-services:
-  cloudflared:
-    container_name: cloudflared
-    image: cloudflare/cloudflared:latest
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${TOKEN}
-    network_mode: host
