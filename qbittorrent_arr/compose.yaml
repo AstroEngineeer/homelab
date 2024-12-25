@@ -5,26 +5,13 @@ networks:
 
 services:
   qbittorrentvpn:
-    image: binhex/arch-qbittorrentvpn
-    container_name: qbittorrentvpn
     cap_add:
-      - NET_ADMIN
+    - NET_ADMIN
+    container_name: qbittorrentvpn
     devices:
-      - /dev/net/tun
-    # privileged: true
-    # sysctls:
-    #   - net.ipv4.conf.all.src_valid_mark=1
-    ports:
-      # - 8118:8118 # privoxy
-      # - 9118:9118 # microsocks
-      - 58946:58946
-      - 58946:58946/udp
-    volumes:
-      - /mnt/void/data/torrents:/data/torrents
-      - ./container_data/qbittorrentvpn/config:/config
-      - /etc/localtime:/etc/localtime:ro
+    - /dev/net/tun
     env_file:
-      - .env
+    - .env
     environment:
       VPN_ENABLED: yes
       VPN_USER: ${VPN_USER}
@@ -48,94 +35,124 @@ services:
       UMASK: 000
       PUID: 1000
       PGID: 1000
-    restart: unless-stopped
+    image: binhex/arch-qbittorrentvpn
     labels:
-      - "traefik.enable=true"
-      # ---qbit---
-      - "traefik.http.middlewares.qbittorrent.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Referer="
-      - "traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Origin="
-      - "traefik.http.routers.qbittorrent.tls=true"
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local.xerogravity.space`) || Host(`qbittorrent.ts.xerogravity.space`)"
-      - "traefik.http.routers.qbittorrent.entrypoints=https"
-      - "traefik.http.routers.qbittorrent.middlewares=qbittorrent"
-      - "traefik.http.routers.qbittorrent.service=qbittorrent"
-      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-      - "traefik.http.services.qbittorrent.loadbalancer.passhostheader=false"
+      traefik.enable: true
       # ---prowlarr---
-      - "traefik.http.routers.prowlarr.tls=true"
-      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.local.xerogravity.space`) || Host(`prowlarr.ts.xerogravity.space`)"
-      - "traefik.http.routers.prowlarr.entrypoints=https"
-      - "traefik.http.routers.prowlarr.service=prowlarr"
-      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+      traefik.http.routers.prowlarr.entrypoints: https
+      traefik.http.routers.prowlarr.rule: Host(`prowlarr.local.xerogravity.space`) || Host(`prowlarr.ts.xerogravity.space`)
+      traefik.http.routers.prowlarr.service: prowlarr
+      traefik.http.routers.prowlarr.tls: true
+      traefik.http.services.prowlarr.loadbalancer.server.port: 9696
+      # ---qbit---
+      traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Origin: ''
+      traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Referer: ''
+      traefik.http.middlewares.qbittorrent.headers.customrequestheaders.X-Frame-Options: SAMEORIGIN
+      traefik.http.routers.qbittorrent.entrypoints: https
+      traefik.http.routers.qbittorrent.middlewares: qbittorrent
+      traefik.http.routers.qbittorrent.rule: Host(`qbittorrent.local.xerogravity.space`) || Host(`qbittorrent.ts.xerogravity.space`)
+      traefik.http.routers.qbittorrent.service: qbittorrent
+      traefik.http.routers.qbittorrent.tls: true
+      traefik.http.services.qbittorrent.loadbalancer.passhostheader: false
+      traefik.http.services.qbittorrent.loadbalancer.server.port: 8080
       # ---radarr---
-      - "traefik.http.routers.radarr.tls=true"
-      - "traefik.http.routers.radarr.rule=Host(`radarr.local.xerogravity.space`) || Host(`radarr.ts.xerogravity.space`)"
-      - "traefik.http.routers.radarr.entrypoints=https"
-      - "traefik.http.routers.radarr.service=radarr"
-      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+      traefik.http.routers.radarr.entrypoints: https
+      traefik.http.routers.radarr.rule: Host(`radarr.local.xerogravity.space`) || Host(`radarr.ts.xerogravity.space`)
+      traefik.http.routers.radarr.service: radarr
+      traefik.http.routers.radarr.tls: true
+      traefik.http.services.radarr.loadbalancer.server.port: 7878
       # ---sonarr---
-      - "traefik.http.routers.sonarr.tls=true"
-      - "traefik.http.routers.sonarr.rule=Host(`sonarr.local.xerogravity.space`) || Host(`sonarr.ts.xerogravity.space`)"
-      - "traefik.http.routers.sonarr.entrypoints=https"
-      - "traefik.http.routers.sonarr.service=sonarr"
-      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+      traefik.http.routers.sonarr.entrypoints: https
+      traefik.http.routers.sonarr.rule: Host(`sonarr.local.xerogravity.space`) || Host(`sonarr.ts.xerogravity.space`)
+      traefik.http.routers.sonarr.service: sonarr
+      traefik.http.routers.sonarr.tls: true
+      traefik.http.services.sonarr.loadbalancer.server.port: 8989
+    ports:
+    - 58946:58946
+    - 58946:58946/udp
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data/torrents
+      target: /data/torrents
+      read_only: false
+    - type: bind
+      source: ./container_data/qbittorrentvpn/config
+      target: /config
+      read_only: false
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
   
   flaresolverr:
     container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    restart: unless-stopped
-    environment:
-      - CAPTCHA_SOLVER=none
-      - LOG_LEVEL=debug
-      - LOG_HTML=false
-      - TZ=Asia/Kolkata
-    network_mode: "container:qbittorrentvpn"
     depends_on:
-      - qbittorrentvpn
+    - qbittorrentvpn
+    environment:
+      CAPTCHA_SOLVER: none
+      LOG_HTML: false
+      LOG_LEVEL: debug
+      TZ: Asia/Kolkata
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
   
   prowlarr:
-      container_name: prowlarr
-      image: lscr.io/linuxserver/prowlarr:latest
-      restart: unless-stopped
-      environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=Asia/Kolkata
-      volumes:
-        - ./container_data/prowlarr/config:/config
-      network_mode: "container:qbittorrentvpn"
-      depends_on:
-        - qbittorrentvpn
+    container_name: prowlarr
+    depends_on:
+    - qbittorrentvpn
+    environment:
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/prowlarr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/prowlarr/config
+      target: /config
+      read_only: false
   
   radarr:
     container_name: radarr
-    image: lscr.io/linuxserver/radarr:latest
-    restart: unless-stopped
-    environment:
-      # - DOCKER_MODS=linuxserver/mods:radarr-striptracks
-      - PGID=1000
-      - PUID=1000
-      - TZ=Asia/Kolkata
-    volumes:
-      - /mnt/void/data:/data
-      - ./container_data/radarr/config:/config
-    network_mode: "container:qbittorrentvpn"
     depends_on:
-      - qbittorrentvpn
+    - qbittorrentvpn
+    environment:
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/radarr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data
+      target: /data
+      read_only: false
+    - type: bind
+      source: ./container_data/radarr/config
+      target: /config
+      read_only: false
   
   sonarr:
-    container_name: sonarr    
-    image: lscr.io/linuxserver/sonarr:latest
-    restart: unless-stopped
-    environment:
-      # - DOCKER_MODS=linuxserver/mods:radarr-striptracks
-      - PGID=1000
-      - PUID=1000
-      - TZ=Asia/Kolkata
-    volumes:
-      - /mnt/void/data:/data
-      - ./container_data/sonarr/config:/config
-    network_mode: "container:qbittorrentvpn"
+    container_name: sonarr
     depends_on:
-      - qbittorrentvpn
+    - qbittorrentvpn
+    environment:
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/sonarr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data
+      target: /data
+      read_only: false
+    - type: bind
+      source: ./container_data/sonarr/config
+      target: /config
+      read_only: false

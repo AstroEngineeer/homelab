@@ -2,21 +2,23 @@ networks:
   default:
     name: tk-proxy
     external: true
-    
+
 services:
   jellyseerr:
     container_name: jellyseerr
-    image: fallenbagel/jellyseerr:latest
-    restart: unless-stopped
     environment:
-      - LOG_LEVEL=debug
-      - TZ=Asia/Kolkata
-    volumes:
-      - ./container_data/jellyseerr/config:/app/config
+      TZ: Asia/Kolkata
+    image: fallenbagel/jellyseerr:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.jellyseerr.tls=true"
-      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.local.xerogravity.space`) || Host(`jellyseerr.ts.xerogravity.space`) || Host(`jellyseerr.cf.xerogravity.space`)"
-      - "traefik.http.routers.jellyseerr.entrypoints=https"
-      - "traefik.http.routers.jellyseerr.service=jellyseerr"
-      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
+      traefik.enable: true
+      traefik.http.routers.jellyseerr.entrypoints: https
+      traefik.http.routers.jellyseerr.rule: Host(`jellyseerr.local.xerogravity.space`) || Host(`jellyseerr.ts.xerogravity.space`) || Host(`jellyseerr.cf.xerogravity.space`)
+      traefik.http.routers.jellyseerr.service: jellyseerr
+      traefik.http.routers.jellyseerr.tls: true
+      traefik.http.services.jellyseerr.loadbalancer.server.port: 5055
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/jellyseerr/config
+      target: /app/config
+      read_only: false

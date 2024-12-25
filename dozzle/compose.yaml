@@ -6,16 +6,19 @@ networks:
 services:
   dozzle:
     container_name: dozzel
-    image: amir20/dozzle:latest
-    restart: unless-stopped
     environment:
-      - DOZZLE_HOSTNAME=dozzel.local.xerogravity.space
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      DOZZLE_HOSTNAME: dozzel.local.xerogravity.space
+    image: amir20/dozzle:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dozzel.tls=true"
-      - "traefik.http.routers.dozzel.rule=Host(`dozzel.local.xerogravity.space`)"
-      - "traefik.http.routers.dozzel.entrypoints=https"
-      - "traefik.http.routers.dozzel.service=dozzel"
-      - "traefik.http.services.dozzel.loadbalancer.server.port=8080"
+      traefik.enable: true
+      traefik.http.routers.dozzel.entrypoints: https
+      traefik.http.routers.dozzel.rule: Host(`dozzel.local.xerogravity.space`)
+      traefik.http.routers.dozzel.service: dozzel
+      traefik.http.routers.dozzel.tls: true
+      traefik.http.services.dozzel.loadbalancer.server.port: 8080
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: false

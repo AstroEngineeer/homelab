@@ -2,22 +2,37 @@ networks:
   default:
     name: tk-proxy
     external: true
-    
+
 services:
   homarr:
     container_name: homarr
     image: ghcr.io/ajnart/homarr:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.homarr.entrypoints: https
+      traefik.http.routers.homarr.rule: Host(`homarr.local.xerogravity.space`)
+      traefik.http.routers.homarr.service: homarr
+      traefik.http.routers.homarr.tls: true
+      traefik.http.services.homarr.loadbalancer.server.port: 7575
     restart: unless-stopped
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./container_data/homarr/configs:/app/data/configs
-      - ./container_data/homarr/data:/data
-      - ./container_data/homarr/icons:/app/public/icons
-      - ./container_data/homarr/backgrounds:/app/public/imgs/backgrounds
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homarr.tls=true"
-      - "traefik.http.routers.homarr.rule=Host(`homarr.local.xerogravity.space`)"
-      - "traefik.http.routers.homarr.entrypoints=https"
-      - "traefik.http.routers.homarr.service=homarr"
-      - "traefik.http.services.homarr.loadbalancer.server.port=7575"
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: false
+    - type: bind
+      source: ./container_data/homarr/configs
+      target: /app/data/configs
+      read_only: false
+    - type: bind
+      source: ./container_data/homarr/data
+      target: /data
+      read_only: false
+    - type: bind
+      source: ./container_data/homarr/icons
+      target: /app/public/icons
+      read_only: false
+    - type: bind
+      source: ./container_data/homarr/backgrounds
+      target: /app/public/imgs/backgrounds
+      read_only: false

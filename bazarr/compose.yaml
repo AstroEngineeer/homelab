@@ -6,19 +6,25 @@ networks:
 services:
   bazarr:
     container_name: bazarr
-    image: lscr.io/linuxserver/bazarr:latest
-    restart: unless-stopped
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Kolkata
-    volumes:
-      - /mnt/void/data/media:/data/media
-      - ./container_data/bazarr/config:/config
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/bazarr:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.bazarr.tls=true"
-      - "traefik.http.routers.bazarr.rule=Host(`bazarr.local.xerogravity.space`)"
-      - "traefik.http.routers.bazarr.entrypoints=https"
-      - "traefik.http.routers.bazarr.service=bazarr"
-      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+      traefik.enable: true
+      traefik.http.routers.bazarr.entrypoints: https
+      traefik.http.routers.bazarr.rule: Host(`bazarr.local.xerogravity.space`)
+      traefik.http.routers.bazarr.service: bazarr
+      traefik.http.routers.bazarr.tls: true
+      traefik.http.services.bazarr.loadbalancer.server.port: 6767
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data/media
+      target: /data/media
+      read_only: false
+    - type: bind
+      source: ./container_data/bazarr/config
+      target: /config
+      read_only: false

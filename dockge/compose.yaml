@@ -6,18 +6,27 @@ networks:
 services:
   dockge:
     container_name: dockge
-    image: louislam/dockge:1
-    restart: unless-stopped
     environment:
-      - DOCKGE_STACKS_DIR=/home/debian/homelab
-    volumes:
-      - /home/debian/homelab:/home/debian/homelab
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./container_data/dockge/data:/app/data
+      DOCKGE_STACKS_DIR: /home/debian/homelab
+    image: louislam/dockge:1
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dockge.tls=true"
-      - "traefik.http.routers.dockge.rule=Host(`dockge.local.xerogravity.space`)"
-      - "traefik.http.routers.dockge.entrypoints=https"
-      - "traefik.http.routers.dockge.service=dockge"
-      - "traefik.http.services.dockge.loadbalancer.server.port=5001"
+      traefik.enable: true
+      traefik.http.routers.dockge.entrypoints: https
+      traefik.http.routers.dockge.rule: Host(`dockge.local.xerogravity.space`)
+      traefik.http.routers.dockge.service: dockge
+      traefik.http.routers.dockge.tls: true
+      traefik.http.services.dockge.loadbalancer.server.port: 5001
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /home/debian/homelab
+      target: /home/debian/homelab
+      read_only: false
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: false
+    - type: bind
+      source: ./container_data/dockge/data
+      target: /app/data
+      read_only: false

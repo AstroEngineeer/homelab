@@ -8,41 +8,50 @@ networks:
 services:
   postgres:
     container_name: gamevault-postgres
+    env_file:
+    - .env
+    environment:
+      POSTGRES_DB: gamevault
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: gamevault
     image: postgres:16
     restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      - POSTGRES_DB=gamevault
-      - POSTGRES_USER=gamevault
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
-      - ./container_data/postgres/data:/var/lib/postgresql/data
-
-  gamevault-backend:
-    container_name: gamevault-backend
-    image: phalcode/gamevault-backend:latest
-    restart: unless-stopped
+    - type: bind
+      source: ./container_data/postgres/data
+      target: /var/lib/postgresql/data
+      read_only: false
+  
+  gamevault:
+    container_name: gamevault
     depends_on:
-      - postgres
+    - postgres
     env_file:
-      - .env
+    - .env
     environment:
-      - DB_HOST=gamevault-postgres
-      - DB_USERNAME=gamevault
-      - DB_PASSWORD=${DB_PASSWORD}
-      - METADATA_IGDB_CLIENT_ID=${IGDB_CLIENT_ID}
-      - METADATA_IGDB_CLIENT_SECRET=${IGDB_CLIENT_SECRET}
-    networks:
-      - default
-      - tk-proxy
-    volumes:
-      - /mnt/void/games:/files
-      - ./container_data/gamevault/media:/media
+      DB_HOST: gamevault-postgres
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USERNAME: gamevault
+      METADATA_IGDB_CLIENT_ID: ${IGDB_CLIENT_ID}
+      METADATA_IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET}
+    image: phalcode/gamevault-backend:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.gamevault.tls=true"
-      - "traefik.http.routers.gamevault.rule=Host(`gamevault.local.xerogravity.space`)"
-      - "traefik.http.routers.gamevault.entrypoints=https"
-      - "traefik.http.routers.gamevault.service=gamevault"
-      - "traefik.http.services.gamevault.loadbalancer.server.port=8080"
+      traefik.enable: true
+      traefik.http.routers.gamevault.entrypoints: https
+      traefik.http.routers.gamevault.rule: Host(`gamevault.local.xerogravity.space`)
+      traefik.http.routers.gamevault.service: gamevault
+      traefik.http.routers.gamevault.tls: true
+      traefik.http.services.gamevault.loadbalancer.server.port: 8080
+    networks:
+    - default
+    - tk-proxy
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/games
+      target: /files
+      read_only: false
+    - type: bind
+      source: ./container_data/gamevault/media
+      target: /media
+      read_only: false

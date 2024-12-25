@@ -4,22 +4,31 @@ networks:
     external: true
 
 services:
-    cabernet:
-        container_name: cabernet
-        image: ghcr.io/cabernetwork/cabernet:latest
-        environment:
-          - TZ="Asia/Kolkata"
-          - PUID=1000
-          - PGID=1000
-        restart: unless-stopped
-        volumes:
-          - ./container_data/cabernet/data:/app/data    
-          - ./container_data/cabernet/plugins_ext:/app/plugins_ext
-          - ./container_data/cabernet/secrets:/app/.cabernet
-        labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.cabernet.tls=true"
-          - "traefik.http.routers.cabernet.rule=Host(`cabernet.local.xerogravity.space`)"
-          - "traefik.http.routers.cabernet.entrypoints=https"
-          - "traefik.http.routers.cabernet.service=cabernet"
-          - "traefik.http.services.cabernet.loadbalancer.server.port=6077"
+  cabernet:
+    container_name: cabernet
+    environment:
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: ghcr.io/cabernetwork/cabernet:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.cabernet.entrypoints: https
+      traefik.http.routers.cabernet.rule: Host(`cabernet.local.xerogravity.space`)
+      traefik.http.routers.cabernet.service: cabernet
+      traefik.http.routers.cabernet.tls: true
+      traefik.http.services.cabernet.loadbalancer.server.port: 6077
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/cabernet/data
+      target: /app/data
+      read_only: false
+    - type: bind
+      source: ./container_data/cabernet/plugins_ext
+      target: /app/plugins_ext
+      read_only: false
+    - type: bind
+      source: ./container_data/cabernet/secrets
+      target: /app/.cabernet
+      read_only: false

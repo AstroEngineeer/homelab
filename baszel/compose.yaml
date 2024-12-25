@@ -1,7 +1,5 @@
 networks:
   default:
-    name: beszel-network
-  tk-proxy:
     name: tk-proxy
     external: true
 
@@ -9,31 +7,35 @@ services:
   beszel:
     container_name: beszel
     image: henrygd/beszel:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.beszel.entrypoints: https
+      traefik.http.routers.beszel.rule: Host(`beszel.local.xerogravity.space`)
+      traefik.http.routers.beszel.service: beszel
+      traefik.http.routers.beszel.tls: true
+      traefik.http.services.beszel.loadbalancer.server.port: 8090
     restart: unless-stopped
     volumes:
-      - ./container_data/beszel/beszel_data:/beszel_data
-    ports:
-      - 8090:8090
-    networks:
-      - default
-      - tk-proxy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.beszel.tls=true"
-      - "traefik.http.routers.beszel.rule=Host(`beszel.local.xerogravity.space`)"
-      - "traefik.http.routers.beszel.entrypoints=https"
-      - "traefik.http.routers.beszel.service=beszel"
-      - "traefik.http.services.beszel.loadbalancer.server.port=8090"
-
+    - type: bind
+      source: ./container_data/beszel/beszel_data
+      target: /beszel_data
+      read_only: false
+  
   beszel-agent:
     container_name: beszel-agent
-    image: henrygd/beszel-agent
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /mnt/void/.beszel:/extra-filesystems/sdb:ro
     env_file:
-      - .env
+    - .env
     environment:
-      - "KEY=${SSH_KEY}"
+      KEY: ${SSH_KEY}
+    image: henrygd/beszel-agent
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: true
+    - type: bind
+      source: /mnt/void/.beszel
+      target: /extra-filesystems/sdb
+      read_only: true
