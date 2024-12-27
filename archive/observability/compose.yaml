@@ -7,73 +7,100 @@ networks:
 
 services:
   alloy:
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data
+      /etc/alloy/config.alloy
     container_name: alloy
-    image: grafana/alloy:latest
-    restart: unless-stopped
-    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     env_file:
-      - .env
+    - .env
     environment:
-      - GRAFANA_CLOUD_API_KEY=${GRAFANA_CLOUD_API_KEY}
-      - PROMETHEUS_USERNAME=${PROMETHEUS_USERNAME}
-    ports:
-      - 12345:12345
-    volumes:
-      - ./container_data/alloy/config.alloy:/etc/alloy/config.alloy
-    networks:
-      - default
-      - tk-proxy
+      GRAFANA_CLOUD_API_KEY: ${GRAFANA_CLOUD_API_KEY}
+      PROMETHEUS_USERNAME: ${PROMETHEUS_USERNAME}
+    image: grafana/alloy:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.alloy.tls=true"
-      - "traefik.http.routers.alloy.entrypoints=https"
-      - "traefik.http.routers.alloy.rule=Host(`alloy.local.xerogravity.space`)"
-      - "traefik.http.routers.alloy.service=alloy"
-      - "traefik.http.services.alloy.loadbalancer.server.port=12345"
-
+      traefik.enable: true
+      traefik.http.routers.alloy.entrypoints: https
+      traefik.http.routers.alloy.rule: Host(`alloy.local.xerogravity.space`)
+      traefik.http.routers.alloy.service: alloy
+      traefik.http.routers.alloy.tls: true
+      traefik.http.services.alloy.loadbalancer.server.port: 12345
+    networks:
+    - default
+    - tk-proxy
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/alloy/config.alloy
+      target: /etc/alloy/config.alloy
+      read_only: false
+  
   node-exporter:
+    command:
+    - --path.procfs=/host/proc
+    - --path.rootfs=/rootfs
+    - --path.sysfs=/host/sys
+    - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
     container_name: node-exporter
     image: prom/node-exporter:latest
-    restart: unless-stopped
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     ports:
-      - 9100:9100
+    - 9100:9100
+    restart: unless-stopped
     volumes:
-      - /:/rootfs:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-
+    - type: bind
+      source: /
+      target: /rootfs
+      read_only: true
+    - type: bind
+      source: /proc
+      target: /host/proc
+      read_only: true
+    - type: bind
+      source: /sys
+      target: /host/sys
+      read_only: true
+  
   cadvisor:
     container_name: cadvisor
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
-    restart: unless-stopped
-    privileged: true
-    ports:
-      - 8090:8080
-    volumes:
-      - /:/rootfs:ro
-      - /dev/disk/:/dev/disk:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /var/run:/var/run:ro
     devices:
-      - /dev/kmsg
+    - /dev/kmsg
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    ports:
+    - 8090:8080
+    privileged: true
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /
+      target: /rootfs
+      read_only: true
+    - type: bind
+      source: /dev/disk/
+      target: /dev/disk
+      read_only: true
+    - type: bind
+      source: /sys
+      target: /sys
+      read_only: true
+    - type: bind
+      source: /var/lib/docker/
+      target: /var/lib/docker
+      read_only: true
+    - type: bind
+      source: /var/run
+      target: /var/run
+      read_only: true
   
   dcgm-exporter:
-    container_name: dcgm-exporter
-    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.7-3.5.0-ubuntu22.04
-    restart: unless-stopped
     command: curl localhost:9400/metrics
-    ports:
-      - 9400:9400
+    container_name: dcgm-exporter
     deploy:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+          - driver: nvidia
+            count: all
+            capabilities:
+            - gpu
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.7-3.5.0-ubuntu22.04
+    ports:
+    - 9400:9400
+    restart: unless-stopped

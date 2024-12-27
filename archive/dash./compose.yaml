@@ -5,22 +5,15 @@ networks:
 
 services:
   dashdot:
-    stdin_open: true
-    tty: true
-    ports:
-      - 3002:3002
-    volumes:
-      - /:/mnt/host:ro
-    privileged: true
-    image: mauricenino/dashdot:nvidia
     container_name: dashdot
     deploy:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+          - driver: nvidia
+            count: all
+            capabilities:
+            - gpu
     environment:
       DASHDOT_WIDGET_LIST: os,cpu,storage,ram,network,gpu
       DASHDOT_PORT: 3002
@@ -32,9 +25,20 @@ services:
       DASHDOT_NETWORK_LABEL_LIST: type,speed_up,speed_down,interface_speed,public_ip
       DASHDOT_ACCEPT_OOKLA_EULA: true
       DASHDOT_NETWORK_SPEED_AS_BYTES: true
+    image: mauricenino/dashdot:nvidia
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashdot.entrypoints=https"
-      - "traefik.http.routers.dashdot.rule=Host(`dashdot.matrix.xerogravity.space`)"
-      - "traefik.http.routers.dashdot.service=dashdot"
-      - "traefik.http.services.dashdot.loadbalancer.server.port=3002"
+      traefik.enable: true
+      traefik.http.routers.dashdot.entrypoints: https
+      traefik.http.routers.dashdot.rule: Host(`dashdot.matrix.xerogravity.space`)
+      traefik.http.routers.dashdot.service: dashdot
+      traefik.http.services.dashdot.loadbalancer.server.port: 3002
+    ports:
+    - 3002:3002
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+    - type: bind
+      source: /
+      target: /mnt/host
+      read_only: true

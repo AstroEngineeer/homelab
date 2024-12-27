@@ -6,26 +6,26 @@ networks:
 services:
   neko:
     container_name: neko
-    image: m1k1o/neko:firefox
-    restart: unless-stopped
-    shm_size: 2gb
-    ports:
-      - 8080:8080
-      - 52000-52100:52000-52100/udp
     env_file:
-      - .env
-    volumes:
-      - ./container_data/neko/firefox:/home/neko/.mozilla/firefox/profile.default
+    - .env
     environment:
-      NEKO_SCREEN: '1920x1080@60'
+      NEKO_SCREEN: 1920x1080@60
       NEKO_PASSWORD: ${PASSWORD}
       NEKO_PASSWORD_ADMIN: ${ADMIN_PASSWORD}
       NEKO_EPR: 52000-52100
       NEKO_NAT1TO1: 192.168.18.2
+    image: m1k1o/neko:firefox
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.neko.tls=true"
-      - "traefik.http.routers.neko.rule=Host(`neko.local.xerogravity.space`)"
-      - "traefik.http.routers.neko.entrypoints=https"
-      - "traefik.http.routers.neko.service=neko"
-      - "traefik.http.services.neko.loadbalancer.server.port=8080"
+      traefik.enable: true
+      traefik.http.routers.neko.entrypoints: https
+      traefik.http.routers.neko.rule: Host(`neko.local.xerogravity.space`)
+      traefik.http.routers.neko.service: neko
+      traefik.http.routers.neko.tls: true
+      traefik.http.services.neko.loadbalancer.server.port: 8080
+    restart: unless-stopped
+    shm_size: 2gb
+    volumes:
+    - type: bind
+      source: ./container_data/neko/firefox
+      target: /home/neko/.mozilla/firefox/profile.default
+      read_only: false

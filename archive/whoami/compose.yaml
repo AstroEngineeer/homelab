@@ -5,23 +5,20 @@ networks:
 
 services:
   whoami:
+    command:
+    - --port=2001
+    - --name=i-am-ironman
     container_name: whoami
     image: traefik/whoami
-    ports:
-      - 2001:2001
-    command:
-       - --port=2001
-       - --name=i-am-ironman
     labels:
-      - "traefik.enable=true"
-      # middlewares
-      - 'traefik.http.middlewares.whoami.headers.customRequestHeaders.Connection=Upgrade'
-      - 'traefik.http.middlewares.whoami.headers.customRequestHeaders.Upgrade=websocket'
-      # router
-      - "traefik.http.routers.whoami.tls=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.local.xerogravity.space`)"
-      - "traefik.http.routers.whoami.entrypoints=https"
-      - "traefik.http.routers.whoami.middlewares=whoami"
-      - "traefik.http.routers.whoami.service=whoami"
-      # service
-      - "traefik.http.services.whoami.loadbalancer.server.port=2001"
+      traefik.enable: true
+      traefik.http.middlewares.whoami.headers.customRequestHeaders.Connection: Upgrade
+      traefik.http.middlewares.whoami.headers.customRequestHeaders.Upgrade: websocket
+      traefik.http.routers.whoami.entrypoints: https
+      traefik.http.routers.whoami.middlewares: whoami
+      traefik.http.routers.whoami.rule: Host(`whoami.local.xerogravity.space`)
+      traefik.http.routers.whoami.service: whoami
+      traefik.http.routers.whoami.tls: true
+      traefik.http.services.whoami.loadbalancer.server.port: 2001
+    ports:
+    - 2001:2001

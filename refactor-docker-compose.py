@@ -135,8 +135,8 @@ def reorder_compose(compose_file):
 
 def find_compose_files():
     # Search for `compose.yaml` files, excluding the `./archive` path
-    return [file for file in glob.glob("./**/compose.yaml", recursive=True) if file.startswith("./archive/")]
-    # return ["./xyz/compose.yaml"]
+    # return [file for file in glob.glob("./**/compose.yaml", recursive=True) if file.startswith("./archive/")]
+    return ["./archive/cloudflare-ddns/compose.yaml"]
 
 if __name__ == "__main__":
     compose_files = find_compose_files()

@@ -6,59 +6,65 @@ networks:
 services:
   qbittorrent:
     container_name: qbittorrent
-    image: lscr.io/linuxserver/qbittorrent:latest
-    restart: unless-stopped
     environment:
-      - PGID=1000
-      - PUID=1000
-      - TORRENTING_PORT=6881
-      - TZ=Asia/Kolkata
-      - WEBUI_PORT=8080
-      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
-    volumes:
-      - /mnt/void/data/torrents:/data/torrents
-      - ./container_data/qbittorrent/config:/config
+      DOCKER_MODS: ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+      PGID: 1000
+      PUID: 1000
+      TORRENTING_PORT: 6881
+      TZ: Asia/Kolkata
+      WEBUI_PORT: 8080
+    image: lscr.io/linuxserver/qbittorrent:latest
     labels:
-      - "traefik.enable=true"
-      # middleware
-      - "traefik.http.middlewares.qbittorrent-old.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.qbittorrent-old.headers.customrequestheaders.Referer="
-      - "traefik.http.middlewares.qbittorrent-old.headers.customrequestheaders.Origin="
-      # router
-      - "traefik.http.routers.qbittorrent-old.tls=true"
-      - "traefik.http.routers.qbittorrent-old.rule=Host(`qbittorrent-old.local.xerogravity.space`)"
-      - "traefik.http.routers.qbittorrent-old.entrypoints=https"
-      - "traefik.http.routers.qbittorrent-old.middlewares=qbittorrent-old"
-      - "traefik.http.routers.qbittorrent-old.service=qbittorrent-old"
-      # service
-      - "traefik.http.services.qbittorrent-old.loadbalancer.server.port=8080"
-      - "traefik.http.services.qbittorrent-old.loadbalancer.passhostheader=false"
+      traefik.enable: true
+      traefik.http.middlewares.qbittorrent-old.headers.customrequestheaders.Origin: ''
+      traefik.http.middlewares.qbittorrent-old.headers.customrequestheaders.Referer: ''
+      traefik.http.middlewares.qbittorrent-old.headers.customrequestheaders.X-Frame-Options: SAMEORIGIN
+      traefik.http.routers.qbittorrent-old.entrypoints: https
+      traefik.http.routers.qbittorrent-old.middlewares: qbittorrent-old
+      traefik.http.routers.qbittorrent-old.rule: Host(`qbittorrent-old.local.xerogravity.space`)
+      traefik.http.routers.qbittorrent-old.service: qbittorrent-old
+      traefik.http.routers.qbittorrent-old.tls: true
+      traefik.http.services.qbittorrent-old.loadbalancer.passhostheader: false
+      traefik.http.services.qbittorrent-old.loadbalancer.server.port: 8080
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data/torrents
+      target: /data/torrents
+      read_only: false
+    - type: bind
+      source: ./container_data/qbittorrent/config
+      target: /config
+      read_only: false
   
   seedbox:
     container_name: seedbox
-    image: lscr.io/linuxserver/qbittorrent:latest
-    restart: unless-stopped
     environment:
-      - PGID=1000
-      - PUID=1000
-      - TORRENTING_PORT=6881
-      - TZ=Asia/Kolkata
-      - WEBUI_PORT=8080
-    volumes:
-      - /mnt/void/seedbox/torrents:/data/torrents
-      - ./container_data/seedbox/config:/config
+      PGID: 1000
+      PUID: 1000
+      TORRENTING_PORT: 6881
+      TZ: Asia/Kolkata
+      WEBUI_PORT: 8080
+    image: lscr.io/linuxserver/qbittorrent:latest
     labels:
-      - "traefik.enable=true"
-      # middleware
-      - "traefik.http.middlewares.seedbox.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.seedbox.headers.customrequestheaders.Referer="
-      - "traefik.http.middlewares.seedbox.headers.customrequestheaders.Origin="
-      # router
-      - "traefik.http.routers.seedbox.tls=true"
-      - "traefik.http.routers.seedbox.rule=Host(`seedbox.local.xerogravity.space`)"
-      - "traefik.http.routers.seedbox.entrypoints=https"
-      - "traefik.http.routers.seedbox.middlewares=seedbox"
-      - "traefik.http.routers.seedbox.service=seedbox"
-      # service
-      - "traefik.http.services.seedbox.loadbalancer.server.port=8080"
-      - "traefik.http.services.seedbox.loadbalancer.passhostheader=false"
+      traefik.enable: true
+      traefik.http.middlewares.seedbox.headers.customrequestheaders.Origin: ''
+      traefik.http.middlewares.seedbox.headers.customrequestheaders.Referer: ''
+      traefik.http.middlewares.seedbox.headers.customrequestheaders.X-Frame-Options: SAMEORIGIN
+      traefik.http.routers.seedbox.entrypoints: https
+      traefik.http.routers.seedbox.middlewares: seedbox
+      traefik.http.routers.seedbox.rule: Host(`seedbox.local.xerogravity.space`)
+      traefik.http.routers.seedbox.service: seedbox
+      traefik.http.routers.seedbox.tls: true
+      traefik.http.services.seedbox.loadbalancer.passhostheader: false
+      traefik.http.services.seedbox.loadbalancer.server.port: 8080
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/seedbox/torrents
+      target: /data/torrents
+      read_only: false
+    - type: bind
+      source: ./container_data/seedbox/config
+      target: /config
+      read_only: false

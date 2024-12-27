@@ -5,22 +5,28 @@ networks:
 
 services:
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
-    restart: unless-stopped
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Kolkata
-    ports:
-      - 8084:8080
-    volumes:
-      - /mnt/void/data/usenets:/data/usenets
-      - ./container_data/sabnzbd/config:/config
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/sabnzbd:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.sabnzbd.tls=true"
-      - "traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.local.xerogravity.space`)"
-      - "traefik.http.routers.sabnzbd.entrypoints=https"
-      - "traefik.http.routers.sabnzbd.service=sabnzbd"
-      - "traefik.http.services.sabnzbd.loadbalancer.server.port=8080"
+      traefik.enable: true
+      traefik.http.routers.sabnzbd.entrypoints: https
+      traefik.http.routers.sabnzbd.rule: Host(`sabnzbd.local.xerogravity.space`)
+      traefik.http.routers.sabnzbd.service: sabnzbd
+      traefik.http.routers.sabnzbd.tls: true
+      traefik.http.services.sabnzbd.loadbalancer.server.port: 8080
+    ports:
+    - 8084:8080
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data/usenets
+      target: /data/usenets
+      read_only: false
+    - type: bind
+      source: ./container_data/sabnzbd/config
+      target: /config
+      read_only: false
