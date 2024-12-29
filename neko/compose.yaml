@@ -18,7 +18,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.neko.entrypoints: https
-      traefik.http.routers.neko.rule: Host(`neko.local.xerogravity.space`)
+      traefik.http.routers.neko.rule: Host(`neko.local.xerogravity.space`) || Host(`neko.cf.xerogravity.space`)
       traefik.http.routers.neko.service: neko
       traefik.http.routers.neko.tls: true
       traefik.http.services.neko.loadbalancer.server.port: 8080

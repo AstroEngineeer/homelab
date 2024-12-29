@@ -29,7 +29,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.dashdot.entrypoints: https
-      traefik.http.routers.dashdot.rule: Host(`dashdot.matrix.xerogravity.space`)
+      traefik.http.routers.dashdot.rule: Host(`dashdot.local.xerogravity.space`)
       traefik.http.routers.dashdot.service: dashdot
       traefik.http.services.dashdot.loadbalancer.server.port: 3002
     ports:
