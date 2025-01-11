@@ -51,3 +51,37 @@ services:
       source: ./container_data/jellyfin/config
       target: /config
       read_only: false
+  
+  jellysearch:
+    container_name: jellysearch
+    env_file:
+      - .env
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      INDEX_CRON: 0 0 0/2 ? * * *
+    image: domistyle/jellysearch
+    labels:
+      traefik.enable: true
+      traefik.http.routers.jellysearch.rule: (Host(`jellyfin.local.xerogravity.space`) || Host(`jellyfin.ts.xerogravity.space`) || Host(`jellyfin.cf.xerogravity.space`)) && (QueryRegexp(`searchTerm`, `(.*?)`) || QueryRegexp(`SearchTerm`, `(.*?)`))
+      traefik.http.services.jellysearch.loadbalancer.server.port: 5000
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/jellyfin/config
+      target: /config
+      read_only: true
+  
+  meilisearch:
+    container_name: meilisearch
+    env_file:
+      - .env
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+    image: getmeili/meilisearch:v1.9
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/meilisearch/meili_data
+      target: /meili_data
+      read_only: false
+
