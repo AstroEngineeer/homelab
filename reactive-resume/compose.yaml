@@ -17,7 +17,7 @@ services:
     healthcheck:
       test:
       - 'CMD-SHELL'
-      - 'pg_isready -U postgres -d postgres'
+      - 'pg_isready -U rxresume -d rxresume'
       interval: 10s
       timeout: 5s
       retries: 5
@@ -69,7 +69,7 @@ services:
       DATABASE_URL: postgresql://rxresume:${DB_PASSWORD}@rxresume-postgres:5432/rxresume
       NODE_ENV: production
       PORT: 3005
-      PUBLIC_URL: http://rxresume.local.xerogravity.space
+      PUBLIC_URL: http://rxresume.cf.xerogravity.space
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
       STORAGE_ACCESS_KEY: rxresume
       STORAGE_BUCKET: default
