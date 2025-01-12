@@ -58,7 +58,7 @@ services:
       - .env
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-      INDEX_CRON: 0 0 0/2 ? * * *
+      INDEX_CRON: 0 0 4 ? * * *
     image: domistyle/jellysearch
     labels:
       traefik.enable: true
