@@ -38,12 +38,6 @@ services:
       MINIO_ROOT_PASSWORD: ${STORAGE_PASSWORD}
       MINIO_ROOT_USER: minioadmin
     image: minio/minio
-    restart: unless-stopped
-    volumes:
-    - type: bind
-      source: ./container_data/minio/data
-      target: /data
-      read_only: false
     labels:
       traefik.enable: true
       traefik.http.routers.rxresume-storage.entrypoints: https
@@ -54,6 +48,12 @@ services:
     networks:
     - default
     - tk-proxy
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/minio/data
+      target: /data
+      read_only: false
   
   chrome:
     container_name: rxresume-chrome
