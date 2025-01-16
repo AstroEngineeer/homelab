@@ -58,11 +58,14 @@ services:
       - .env
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-      INDEX_CRON: 0 0 4 ? * * *
+      INDEX_CRON: 0 0 0/2 ? * * *
     image: domistyle/jellysearch
     labels:
       traefik.enable: true
+      traefik.http.routers.jellysearch.entrypoints: https
       traefik.http.routers.jellysearch.rule: (Host(`jellyfin.local.xerogravity.space`) || Host(`jellyfin.ts.xerogravity.space`) || Host(`jellyfin.cf.xerogravity.space`)) && (QueryRegexp(`searchTerm`, `(.*?)`) || QueryRegexp(`SearchTerm`, `(.*?)`))
+      traefik.http.routers.jellysearch.service: jellysearch
+      traefik.http.routers.jellysearch.tls: true
       traefik.http.services.jellysearch.loadbalancer.server.port: 5000
     restart: unless-stopped
     volumes:
