@@ -6,7 +6,6 @@ networks:
 services:
   open-resume:
     container_name: open-resume
-
     image: open-resume
     labels:
       traefik.enable: true

@@ -1,0 +1,21 @@
+services:
+  open-webui:
+    container_name: open-webui
+    env_file:
+      - .env
+    environment:
+      OPENAI_API_KEY: ${API_KEY}
+    image: ghcr.io/open-webui/open-webui:main
+    restart: always
+    labels:
+      traefik.enable: true
+      traefik.http.routers.open-webui.entrypoints: https
+      traefik.http.routers.open-webui.rule: Host(`open-webui.local.xerogravity.space`)
+      traefik.http.routers.open-webui.service: open-webui
+      traefik.http.routers.open-webui.tls: true
+      traefik.http.services.open-webui.loadbalancer.server.port: 8080
+    volumes:
+    - type: bind
+      source: ./container_data/open-webui/data
+      target: /app/backend/data
+      read_only: false
