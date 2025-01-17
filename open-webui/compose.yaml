@@ -15,7 +15,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.open-webui.entrypoints: https
-      traefik.http.routers.open-webui.rule: Host(`open-webui.local.xerogravity.space`)
+      traefik.http.routers.open-webui.rule: Host(`open-webui.local.xerogravity.space`) || Host(`open-webui.ts.xerogravity.space`) || Host(`open-webui.cf.xerogravity.space`)
       traefik.http.routers.open-webui.service: open-webui
       traefik.http.routers.open-webui.tls: true
       traefik.http.services.open-webui.loadbalancer.server.port: 8080
