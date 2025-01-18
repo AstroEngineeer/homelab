@@ -6,7 +6,9 @@ networks:
 services:
   homarr:
     container_name: homarr
-    image: ghcr.io/ajnart/homarr:latest
+    environment:
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY}
+    image: ghcr.io/homarr-labs/homarr:latest
     labels:
       traefik.enable: true
       traefik.http.routers.homarr.entrypoints: https
@@ -21,18 +23,6 @@ services:
       target: /var/run/docker.sock
       read_only: false
     - type: bind
-      source: ./container_data/homarr/configs
-      target: /app/data/configs
-      read_only: false
-    - type: bind
-      source: ./container_data/homarr/data
-      target: /data
-      read_only: false
-    - type: bind
-      source: ./container_data/homarr/icons
-      target: /app/public/icons
-      read_only: false
-    - type: bind
-      source: ./container_data/homarr/backgrounds
-      target: /app/public/imgs/backgrounds
+      source: ./container_data/homarr/appdata
+      target: /appdata
       read_only: false
