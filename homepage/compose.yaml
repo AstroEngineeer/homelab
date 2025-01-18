@@ -1,0 +1,41 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  homepage:
+    container_name: homepage
+    environment:
+      PUID: 1000
+      PGID: 996
+    image: ghcr.io/gethomepage/homepage:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.homepage.entrypoints: https
+      traefik.http.routers.homepage.rule: Host(`homepage.local.xerogravity.space`)
+      traefik.http.routers.homepage.service: homepage
+      traefik.http.routers.homepage.tls: true
+      traefik.http.services.homepage.loadbalancer.server.port: 3000
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/homepage/config
+      target: /app/config
+      read_only: false
+    - type: bind
+      source: ./container_data/homepage/icons
+      target: /app/public/icons
+      read_only: false
+    - type: bind
+      source: ./container_data/homepage/images
+      target: /app/public/images
+      read_only: false
+    - type: bind
+      source: /mnt/void
+      target: /mnt/void
+      read_only: true
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: true

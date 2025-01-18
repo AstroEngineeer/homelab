@@ -1,0 +1,19 @@
+services:
+  homepage:
+    container_name: homepage
+    environment:
+      PUID: 1000
+      PGID: 1000
+    image: ghcr.io/gethomepage/homepage:latest
+    ports:
+    - 3000:3000
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /path/to/config
+      target: /app/config
+      read_only: false
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: true
