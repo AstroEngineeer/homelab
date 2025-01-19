@@ -12,22 +12,7 @@ RECOMMENDED_ORDER = {
     "services": 5,
 }
 
-# Helper function to convert list-based sections to dict and sort alphabetically
-def convert_to_dict_format(section_data):
-    if isinstance(section_data, list):
-        section_dict = {}
-        for item in section_data:
-            if isinstance(item, str) and '=' in item:
-                key, value = item.split('=', 1)
-                section_dict[key] = convert_value(value)  # Convert value to correct type
-            elif isinstance(item, str):
-                section_dict[item] = ''  # If no value is specified, set as empty string
-        # Sort the dictionary alphabetically by key
-        return dict(sorted(section_dict.items()))
-    return section_data
-
-# Function to convert volume definitions to the desired format
-def convert_volumes(volumes):
+def convert_to_expanded_volumes_format(volumes):
     converted_volumes = []
     for volume in volumes:
         if isinstance(volume, str):
@@ -49,6 +34,12 @@ def convert_volumes(volumes):
                     "target": target,
                     "read_only": read_only
                 })
+        else:
+            if isinstance(volume, dict) and "type" in volume and "source" in volume and "target" in volume and isinstance(volume.get("type"), str) and isinstance(volume.get("source"), str) and isinstance(volume.get("target"), str) and isinstance(volume.get("read_only", False), bool):
+                converted_volumes.append(volume)
+            else:
+                 print(f"Error processing {volume}: Error converting volume to expaned format")
+
     return converted_volumes
 
 # Function to convert strings to their appropriate types (e.g., bool, int)
@@ -62,48 +53,68 @@ def convert_value(value):
     except ValueError:
         return value  # Return the string if it's not a recognized type
 
+# Helper function to convert list-based sections to dict and sort alphabetically
+def convert_to_dict_format(section_data):
+    if isinstance(section_data, list):
+        section_dict = {}
+        for item in section_data:
+            if isinstance(item, str) and '=' in item:
+                key, value = item.split('=', 1)
+                section_dict[key] = convert_value(value)  # Convert value to correct type
+            elif isinstance(item, str):
+                section_dict[item] = ''  # If no value is specified, set as empty string
+        # Sort the dictionary alphabetically by key
+        return dict(sorted(section_dict.items()))
+    return section_data
+
 # Function to reorder and validate the structure of the compose file
 def reorder_compose(compose_file):
     try:
         with open(compose_file, 'r') as file:
             data = yaml.safe_load(file)
 
-        # Reorder the networks section
+        # Sort networks section
         if "networks" in data:
             ordered_networks = {key: data["networks"][key] for key in sorted(data["networks"].keys())}
             data["networks"] = ordered_networks
 
-        # Reorder the volumes section
+        # Sort volumes sections
         if "volumes" in data:
-            data["volumes"] = convert_volumes(data["volumes"])
+            ordered_volumes = {key: data["volumes"][key] for key in sorted(data["volumes"].keys())}
+            data["volumes"] = ordered_volumes
 
-        # Reorder the secrets section
+        # Sort secrets section
         if "secrets" in data:
-            data["secrets"] = convert_to_dict_format(data["secrets"])
+            ordered_secrets = {key: data["secrets"][key] for key in sorted(data["secrets"].keys())}
+            data["secrets"] = ordered_secrets
 
-        # Reorder the configs section
+        # Sort configs section
         if "configs" in data:
-            data["configs"] = convert_to_dict_format(data["configs"])
+            ordered_configs = {key: data["configs"][key] for key in sorted(data["configs"].keys())}
+            data["configs"] = ordered_configs
 
-        # Dynamically generate the SERVICE_KEYS based on the keys in the service configurations
+        # Sort service config
         if "services" in data:
             for service_name, service_config in data["services"].items():
-                # Generate SERVICE_KEYS dynamically from the keys in the service config
+                # Get all service config keys
                 service_keys = [key for key in service_config.keys()]
                 
                 # Ensure environment variables are in dict format and alphabetically ordered
                 if "environment" in service_config:
                     service_config["environment"] = convert_to_dict_format(service_config["environment"])
+                # Ensure labels variables are in dict format and alphabetically ordered
                 if "labels" in service_config:
                     service_config["labels"] = convert_to_dict_format(service_config["labels"])
+                # convert volumes to expanded format
                 if "volumes" in service_config:
-                    service_config["volumes"] = convert_volumes(service_config["volumes"])
+                    service_config["volumes"] = convert_to_expanded_volumes_format(service_config["volumes"])
+                # Sort secrets by name
                 if "secrets" in service_config:
-                    service_config["secrets"] = convert_to_dict_format(service_config["secrets"])
-                if "configs" in service_config:
-                    service_config["configs"] = convert_to_dict_format(service_config["configs"])
+                    service_config["secrets"] = sorted(service_config["secrets"])
+                # Todo: sort configs (- source: ... \n target: ...)
+                # if "configs" in service_config:
                 
-                # Reorder service keys based on dynamic service_keys and then sort alphabetically
+                # Sort service configs alphabetically
                 ordered_service_config = {key: service_config[key] for key in sorted(service_keys) if key in service_config}
                 data["services"][service_name] = ordered_service_config
 
@@ -128,15 +139,14 @@ def reorder_compose(compose_file):
         with open(compose_file, 'w') as file:
             dump_with_newlines(ordered_data, file)
 
-        print(f"{compose_file} has been reordered successfully.")
+        print(f"{compose_file} has been formated successfully.")
 
     except Exception as e:
         print(f"Error processing {compose_file}: {e}")
 
 def find_compose_files():
-    # Search for `compose.yaml` files, excluding the `./archive` path
-    # return [file for file in glob.glob("./**/compose.yaml", recursive=True) if file.startswith("./archive/")]
-    return ["./compose.yaml"]
+    # return glob.glob("./**/compose.yaml", recursive=True)
+    return ["./dummy-compose.yaml"]
 
 if __name__ == "__main__":
     compose_files = find_compose_files()
