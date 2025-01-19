@@ -1,6 +1,6 @@
-# My .env files 
+# .env files contain secrets 
 .env
-# App data
+# container app data
 container_data
-# Sources
+# sources for direct builds
 sources
