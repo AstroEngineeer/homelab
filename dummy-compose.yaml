@@ -1,36 +1,20 @@
-networks:
-  default:
-    name: tk-proxy
-    external: true
-
-volumes:
-  sjadhbfhjas: null
-
-secrets:
-  sjkdhbf: null
-  skdjfn: null
-
-configs:
-  hsdjabfkjhas: null
-  kjsdnfkjsd: null
-  zxmjbckjbfsed: null
-
 services:
-  homepage:
-    container_name: homepage
+  threadfin:
+    container_name: threadfin
     environment:
-      PUID: 1000
-      PGID: 1000
-    image: ghcr.io/gethomepage/homepage:latest
+      PGID: 1001
+      PUID: 1001
+      TZ: America/Los_Angeles
+    image: fyb3roptik/threadfin
     ports:
-    - 3000:3000
+    - 34400:34400
     restart: unless-stopped
     volumes:
     - type: bind
-      source: /path/to/config
-      target: /app/config
+      source: ./container_data/threadfin/conf
+      target: /home/threadfin/conf
       read_only: false
     - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
+      source: ./container_data/threadfin/temp
+      target: /tmp/threadfin
       read_only: false

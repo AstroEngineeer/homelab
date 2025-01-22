@@ -1,0 +1,38 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  gluetun:
+    cap_add:
+    - NET_ADMIN
+    container_name: gluetun
+    devices:
+    - /dev/net/tun:/dev/net/tun
+    environment:
+      TZ: Asia/Kolkata
+      VPN_SERVICE_PROVIDER: custom
+      VPN_TYPE: wireguard
+    image: qmcgaw/gluetun:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.m3u-playlist-proxy.entrypoints: https
+      traefik.http.routers.m3u-playlist-proxy.rule: Host(`m3u-playlist-proxy.local.xerogravity.space`)
+      traefik.http.routers.m3u-playlist-proxy.service: m3u-playlist-proxy
+      traefik.http.routers.m3u-playlist-proxy.tls: true
+      traefik.http.services.m3u-playlist-proxy.loadbalancer.server.port: 4123
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/gluetun/gluetun
+      target: /gluetun
+      read_only: false
+
+  m3u-playlist-proxy:
+    container_name: m3u-playlist-proxy
+    depends_on:
+      - gluetun
+    image: dtankdemp/m3u-playlist-proxy:latest
+    network_mode: "service:gluetun"
+    restart: unless-stopped
