@@ -1,20 +1,36 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
 services:
-  threadfin:
-    container_name: threadfin
+  saas:
+    container_name: composecraft
+    depends_on:
+    - mongodb
     environment:
-      PGID: 1001
-      PUID: 1001
-      TZ: America/Los_Angeles
-    image: fyb3roptik/threadfin
+      CORE_ONLY: true
+      MONGODB_URI: mongodb://mongo:${DB_PASS}@db
+      SECRET_KEY: changeme
+      URL: http://localhost:3000
+    image: composecraft/composecraft:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.composecraft.entrypoints: https
+      traefik.http.routers.composecraft.rule: Host(`composecraft.local.xerogravity.space`)
+      traefik.http.routers.composecraft.service: composecraft
+      traefik.http.routers.composecraft.tls: true
+      traefik.http.services.composecraft.loadbalancer.server.port: 5001
     ports:
-    - 34400:34400
-    restart: unless-stopped
+    - 3000:3000
+  mongodb:
+    container_name: composecraft-mongodb
+    environment:
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+      MONGO_INITDB_ROOT_USERNAME: mongo
+    image: mongo:latest
     volumes:
     - type: bind
-      source: ./container_data/threadfin/conf
-      target: /home/threadfin/conf
-      read_only: false
-    - type: bind
-      source: ./container_data/threadfin/temp
-      target: /tmp/threadfin
+      source: ./container_data/mongo/db
+      target: /data/db
       read_only: false

@@ -22,6 +22,12 @@ services:
       traefik.http.routers.m3u-playlist-proxy.service: m3u-playlist-proxy
       traefik.http.routers.m3u-playlist-proxy.tls: true
       traefik.http.services.m3u-playlist-proxy.loadbalancer.server.port: 4123
+      # ------------
+      traefik.http.routers.thetvapp-m3u.entrypoints: https
+      traefik.http.routers.thetvapp-m3u.rule: Host(`thetvapp-m3u.local.xerogravity.space`)
+      traefik.http.routers.thetvapp-m3u.service: thetvapp-m3u
+      traefik.http.routers.thetvapp-m3u.tls: true
+      traefik.http.services.thetvapp-m3u.loadbalancer.server.port: 4124
     restart: unless-stopped
     volumes:
     - type: bind
@@ -34,5 +40,13 @@ services:
     depends_on:
       - gluetun
     image: dtankdemp/m3u-playlist-proxy:latest
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+  
+  thetvapp-m3u:
+    container_name: thetvapp-m3u
+    depends_on:
+      - gluetun
+    image: dtankdemp/thetvapp-m3u:latest
     network_mode: "service:gluetun"
     restart: unless-stopped

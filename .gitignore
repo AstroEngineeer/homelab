@@ -4,3 +4,5 @@
 container_data
 # sources for direct builds
 sources
+# virtual envs
+venv
