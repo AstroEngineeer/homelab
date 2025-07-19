@@ -6,15 +6,22 @@ networks:
 services:
   neko:
     container_name: neko
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities:
+            - gpu
     env_file:
     - .env
     environment:
-      NEKO_SCREEN: 1920x1080@60
-      NEKO_PASSWORD: ${PASSWORD}
-      NEKO_PASSWORD_ADMIN: ${ADMIN_PASSWORD}
-      NEKO_EPR: 52000-52100
-      NEKO_NAT1TO1: 192.168.18.2
-    image: m1k1o/neko:firefox
+      NEKO_MEMBER_MULTIUSER_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      NEKO_MEMBER_MULTIUSER_USER_PASSWORD: ${PASSWORD}
+      NEKO_WEBRTC_EPR: "56000-56100"
+      NEKO_WEBRTC_NAT1TO1: "192.168.18.2"
+    image: ghcr.io/m1k1o/neko/nvidia-firefox:latest
     labels:
       traefik.enable: true
       traefik.http.routers.neko.entrypoints: https
@@ -22,10 +29,6 @@ services:
       traefik.http.routers.neko.service: neko
       traefik.http.routers.neko.tls: true
       traefik.http.services.neko.loadbalancer.server.port: 8080
+    ports:
+    - "56000-56100:56000-56100/udp"
     restart: unless-stopped
-    shm_size: 2gb
-    volumes:
-    - type: bind
-      source: ./container_data/neko/firefox
-      target: /home/neko/.mozilla/firefox/profile.default
-      read_only: false
