@@ -1,8 +1,6 @@
-# .env files contain secrets 
+# env files contain secrets 
 .env
 # container app data
 container_data
 # sources for direct builds
-sources
-# virtual envs
-venv
+openresume/open-resume/
