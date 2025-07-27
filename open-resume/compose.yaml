@@ -5,6 +5,9 @@ networks:
 
 services:
   open-resume:
+    build:
+      context: ./open-resume-source
+      dockerfile: Dockerfile
     container_name: open-resume
     image: open-resume
     labels:
