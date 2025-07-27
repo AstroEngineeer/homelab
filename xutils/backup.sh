@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# WIP: This script is not working yet.
+
 # === Configuration ===
 BACKUP_DIR="/home/debian/homelab/"  # Directory to back up
 ARCHIVE_NAME="/home/debian/homelab_backup_$(date +%d:%m:%Y-%H:%M:%S).7z"  # Archive name with timestamp
