@@ -146,7 +146,7 @@ def reorder_compose(compose_file):
 
 def find_compose_files():
     # return glob.glob("./**/compose.yaml", recursive=True)
-    return ["./dummy-compose.yaml"]
+    return ["./staging-compose.yaml"]
 
 if __name__ == "__main__":
     compose_files = find_compose_files()
