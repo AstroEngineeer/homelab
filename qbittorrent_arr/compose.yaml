@@ -38,6 +38,9 @@ services:
     container_name: qbittorrentvpn
     devices:
     - /dev/net/tun
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 1
+      net.ipv6.conf.default.disable_ipv6: 1
     env_file:
     - .env
     environment:
@@ -45,12 +48,11 @@ services:
       ENABLE_PRIVOXY: false
       ENABLE_SOCKS: false
       ENABLE_STARTUP_SCRIPTS: false
-      LAN_NETWORK: ${LAN_NETWORK}
       NAME_SERVERS: 84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1
       PGID: 1000
       PUID: 1000
       STRICT_PORT_FORWARD: true
-      UMASK: 0
+      UMASK: 002
       USERSPACE_WIREGUARD: false
       VPN_CLIENT: openvpn
       VPN_ENABLED: true
