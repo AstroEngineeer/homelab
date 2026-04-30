@@ -1,0 +1,147 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  flaresolverr:
+    container_name: flaresolverr
+    depends_on:
+    - qbittorrentvpn
+    environment:
+      CAPTCHA_SOLVER: none
+      LOG_HTML: false
+      LOG_LEVEL: debug
+      TZ: Asia/Kolkata
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
+  prowlarr:
+    container_name: prowlarr
+    depends_on:
+    - qbittorrentvpn
+    environment:
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/prowlarr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/prowlarr/config
+      target: /config
+      read_only: false
+  qbittorrentvpn:
+    cap_add:
+    - NET_ADMIN
+    container_name: qbittorrentvpn
+    devices:
+    - /dev/net/tun
+    env_file:
+    - .env
+    environment:
+      DEBUG: false
+      ENABLE_PRIVOXY: false
+      ENABLE_SOCKS: false
+      ENABLE_STARTUP_SCRIPTS: false
+      LAN_NETWORK: ${LAN_NETWORK}
+      NAME_SERVERS: 84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1
+      PGID: 1000
+      PUID: 1000
+      STRICT_PORT_FORWARD: true
+      UMASK: 0
+      USERSPACE_WIREGUARD: false
+      VPN_CLIENT: openvpn
+      VPN_ENABLED: true
+      VPN_INPUT_PORTS: 8080,8191,9696,7878,8989
+      VPN_PASS: ${VPN_PASS}
+      VPN_PROV: protonvpn
+      VPN_USER: ${VPN_USER}
+      WEBUI_PORT: 8080
+    image: binhex/arch-qbittorrentvpn
+    labels:
+      traefik.enable: true
+      traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Origin: ''
+      traefik.http.middlewares.qbittorrent.headers.customrequestheaders.Referer: ''
+      traefik.http.middlewares.qbittorrent.headers.customrequestheaders.X-Frame-Options: SAMEORIGIN
+      traefik.http.routers.prowlarr.entrypoints: https
+      traefik.http.routers.prowlarr.rule: Host(`prowlarr.local.xerogravity.space`)
+        || Host(`prowlarr.ts.xerogravity.space`)
+      traefik.http.routers.prowlarr.service: prowlarr
+      traefik.http.routers.prowlarr.tls: true
+      traefik.http.routers.qbittorrent.entrypoints: https
+      traefik.http.routers.qbittorrent.middlewares: qbittorrent
+      traefik.http.routers.qbittorrent.rule: Host(`qbittorrent.local.xerogravity.space`)
+        || Host(`qbittorrent.ts.xerogravity.space`)
+      traefik.http.routers.qbittorrent.service: qbittorrent
+      traefik.http.routers.qbittorrent.tls: true
+      traefik.http.routers.radarr.entrypoints: https
+      traefik.http.routers.radarr.rule: Host(`radarr.local.xerogravity.space`) ||
+        Host(`radarr.ts.xerogravity.space`)
+      traefik.http.routers.radarr.service: radarr
+      traefik.http.routers.radarr.tls: true
+      traefik.http.routers.sonarr.entrypoints: https
+      traefik.http.routers.sonarr.rule: Host(`sonarr.local.xerogravity.space`) ||
+        Host(`sonarr.ts.xerogravity.space`)
+      traefik.http.routers.sonarr.service: sonarr
+      traefik.http.routers.sonarr.tls: true
+      traefik.http.services.prowlarr.loadbalancer.server.port: 9696
+      traefik.http.services.qbittorrent.loadbalancer.passhostheader: false
+      traefik.http.services.qbittorrent.loadbalancer.server.port: 8080
+      traefik.http.services.radarr.loadbalancer.server.port: 7878
+      traefik.http.services.sonarr.loadbalancer.server.port: 8989
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data/torrents
+      target: /data/torrents
+      read_only: false
+    - type: bind
+      source: ./container_data/qbittorrentvpn/config
+      target: /config
+      read_only: false
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
+  radarr:
+    container_name: radarr
+    depends_on:
+    - qbittorrentvpn
+    environment:
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/radarr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data
+      target: /data
+      read_only: false
+    - type: bind
+      source: ./container_data/radarr/config
+      target: /config
+      read_only: false
+  sonarr:
+    container_name: sonarr
+    depends_on:
+    - qbittorrentvpn
+    environment:
+      PGID: 1000
+      PUID: 1000
+      TZ: Asia/Kolkata
+    image: lscr.io/linuxserver/sonarr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /mnt/void/data
+      target: /data
+      read_only: false
+    - type: bind
+      source: ./container_data/sonarr/config
+      target: /config
+      read_only: false

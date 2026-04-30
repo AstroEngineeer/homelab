@@ -1,0 +1,85 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  scanopy-daemon:
+    container_name: scanopy-daemon
+    env_file:
+    - .env
+    environment:
+      SCANOPY_DAEMON_API_KEY: ${SCANOPY_DAEMON_API_KEY}
+      SCANOPY_LOG_LEVEL: ${SCANOPY_LOG_LEVEL:-info}
+      SCANOPY_MODE: daemon_poll
+      SCANOPY_NAME: scanopy-daemon-home-network
+      SCANOPY_NETWORK_ID: ${SCANOPY_NETWORK_ID}
+      SCANOPY_SERVER_URL: http://localhost:60072
+      SCANOPY_USER_ID: ${SCANOPY_USER_ID}
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -f http://localhost:60073/api/health || exit 1
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    image: ghcr.io/scanopy/scanopy/daemon:latest
+    network_mode: host
+    privileged: true
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/scanopy-daemon/daemon-config
+      target: /root/.config/daemon
+      read_only: false
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: true
+  scanopy-postgres:
+    container_name: scanopy-postgres
+    environment:
+      POSTGRES_DB: scanopy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_USER: postgres
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U postgres
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    image: postgres:17-alpine
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/scanopy-postgres/data
+      target: /var/lib/postgresql/data
+      read_only: false
+  scanopy-server:
+    container_name: scanopy-server
+    depends_on:
+      scanopy-postgres:
+        condition: service_healthy
+    environment:
+      SCANOPY_DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@scanopy-postgres:5432/scanopy
+      SCANOPY_INTEGRATED_DAEMON_URL: http://host.docker.internal:60073
+      SCANOPY_LOG_LEVEL: ${SCANOPY_LOG_LEVEL:-info}
+      SCANOPY_PUBLIC_URL: ${SCANOPY_PUBLIC_URL:-http://localhost:60072}
+      SCANOPY_WEB_EXTERNAL_PATH: /app/static
+    extra_hosts:
+    - host.docker.internal:host-gateway
+    image: ghcr.io/scanopy/scanopy/server:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.scanopy.entrypoints: https
+      traefik.http.routers.scanopy.rule: Host(`scanopy.local.xerogravity.space`)
+      traefik.http.routers.scanopy.service: scanopy
+      traefik.http.routers.scanopy.tls: true
+      traefik.http.services.scanopy.loadbalancer.server.port: 60072
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/scanopy-server/data
+      target: /data
+      read_only: false

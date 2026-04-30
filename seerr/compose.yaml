@@ -1,0 +1,33 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  seerr:
+    container_name: seerr
+    environment:
+      TZ: Asia/Kolkata
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status
+        || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    labels:
+      traefik.enable: true
+      traefik.http.routers.seerr.entrypoints: https
+      traefik.http.routers.seerr.rule: Host(`jellyseerr.local.xerogravity.space`)
+        || Host(`jellyseerr.ts.xerogravity.space`) || Host(`jellyseerr.cf.xerogravity.space`)
+      traefik.http.routers.seerr.service: seerr
+      traefik.http.routers.seerr.tls: true
+      traefik.http.services.seerr.loadbalancer.server.port: 5055
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/seerr/config
+      target: /app/config
+      read_only: false

@@ -1,0 +1,5 @@
+# env files contain secrets 
+.env
+
+# container app data
+container_data

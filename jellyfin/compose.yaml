@@ -1,0 +1,87 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  jellyfin:
+    container_name: jellyfin
+    devices:
+    - /dev/dri/renderD128:/dev/dri/renderD128
+    group_add:
+    - '105'
+    image: jellyfin/jellyfin:latest
+    labels:
+      traefik.enable: true
+      traefik.http.middlewares.jellyfin.headers.browserxssfilter: true
+      traefik.http.middlewares.jellyfin.headers.contenttypenosniff: true
+      traefik.http.middlewares.jellyfin.headers.customresponseheaders.X-Robots-Tag: noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+      traefik.http.middlewares.jellyfin.headers.forcestsheader: true
+      traefik.http.middlewares.jellyfin.headers.framedeny: true
+      traefik.http.middlewares.jellyfin.headers.sslforcehost: true
+      traefik.http.middlewares.jellyfin.headers.sslredirect: true
+      traefik.http.middlewares.jellyfin.headers.stsincludesubdomains: true
+      traefik.http.middlewares.jellyfin.headers.stspreload: true
+      traefik.http.middlewares.jellyfin.headers.stsseconds: 315360000
+      traefik.http.routers.jellyfin.entrypoints: https
+      traefik.http.routers.jellyfin.middlewares: jellyfin
+      traefik.http.routers.jellyfin.rule: Host(`jellyfin.local.xerogravity.space`)
+        || Host(`jellyfin.ts.xerogravity.space`) || Host(`jellyfin.cf.xerogravity.space`)
+      traefik.http.routers.jellyfin.service: jellyfin
+      traefik.http.routers.jellyfin.tls: true
+      traefik.http.services.jellyfin.loadbalancer.server.port: 8096
+    restart: unless-stopped
+    user: 1000:1000
+    volumes:
+    - type: bind
+      source: /mnt/void/data/media
+      target: /media
+      read_only: false
+    - type: bind
+      source: ./container_data/jellyfin/cache
+      target: /cache
+      read_only: false
+    - type: bind
+      source: ./container_data/jellyfin/transcode
+      target: /transcode
+      read_only: false
+    - type: bind
+      source: ./container_data/jellyfin/config
+      target: /config
+      read_only: false
+  jellysearch:
+    container_name: jellysearch
+    env_file:
+    - .env
+    environment:
+      INDEX_CRON: 0 0 0/2 ? * * *
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+    image: domistyle/jellysearch
+    labels:
+      traefik.enable: true
+      traefik.http.routers.jellysearch.entrypoints: https
+      traefik.http.routers.jellysearch.rule: (Host(`jellyfin.local.xerogravity.space`)
+        || Host(`jellyfin.ts.xerogravity.space`) || Host(`jellyfin.cf.xerogravity.space`))
+        && (QueryRegexp(`searchTerm`, `(.*?)`) || QueryRegexp(`SearchTerm`, `(.*?)`))
+      traefik.http.routers.jellysearch.service: jellysearch
+      traefik.http.routers.jellysearch.tls: true
+      traefik.http.services.jellysearch.loadbalancer.server.port: 5000
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/jellyfin/config
+      target: /config
+      read_only: true
+  meilisearch:
+    container_name: meilisearch
+    env_file:
+    - .env
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+    image: getmeili/meilisearch:v1.9
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/meilisearch/meili_data
+      target: /meili_data
+      read_only: false
