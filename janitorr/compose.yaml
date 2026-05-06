@@ -1,0 +1,46 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  janitorr-stats:
+    container_name: janitorr-stats
+    depends_on:
+    - janitorr
+    env_file:
+    - .env
+    environment:
+      JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
+      JELLYFIN_BASE_URL: "http://jellyfin:8096"
+      JELLYFIN_POLL_INTERVAL: 60s
+      TZ: Asia/Kolkata
+    image: ghcr.io/schaka/janitorr-stats:stable-sqlite
+    restart: unless-stopped
+    user: "1000:1000"
+    volumes:
+    - type: bind
+      source: ./container_data/janitorr-stats/data
+      target: /data
+      read_only: false
+
+  janitorr:
+    container_name: janitorr
+    image: ghcr.io/schaka/janitorr:jvm-stable
+    mem_limit: 256M
+    mem_swappiness: 0
+    restart: unless-stopped
+    user: 1000:1000
+    volumes:
+    - type: bind
+      source: ./container_data/janitorr/config/application.yml
+      target: /config/application.yml
+      read_only: true
+    - type: bind
+      source: ./container_data/janitorr/logs
+      target: /logs
+      read_only: false
+    - type: bind
+      source: /mnt/void/data
+      target: /data
+      read_only: false

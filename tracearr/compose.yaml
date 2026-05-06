@@ -1,0 +1,83 @@
+networks:
+  default:
+    name: tk-proxy
+    external: true
+
+services:
+  tracearr-redis:
+    command: redis-server --appendonly yes
+    container_name: tracearr-redis
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    image: redis:8-alpine
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/tracearr-redis/data
+      target: /data
+      read_only: false
+  tracearr-timescale:
+    command: postgres -c timescaledb.license=timescale -c timescaledb.max_tuples_decompressed_per_dml_transaction=0
+      -c max_locks_per_transaction=4096 -c timescaledb.telemetry_level=off
+    container_name: tracearr-db
+    environment:
+      POSTGRES_DB: tracearr
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-tracearr}
+      POSTGRES_USER: tracearr
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U tracearr
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    image: timescale/timescaledb-ha:pg18.1-ts2.25.0
+    restart: unless-stopped
+    shm_size: 512mb
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+    - type: bind
+      source: ./container_data/tracearr-timescale/data
+      target: /home/postgres/pgdata/data
+      read_only: false
+  tracearr:
+    container_name: tracearr
+    depends_on:
+      tracearr-timescale:
+        condition: service_healthy
+      tracearr-redis:
+        condition: service_healthy
+    environment:
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      DATABASE_URL: postgres://tracearr:${DB_PASSWORD:-tracearr}@tracearr-timescale:5432/tracearr
+      HOST: 0.0.0.0
+      JWT_SECRET: ${JWT_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NODE_ENV: production
+      PORT: 3000
+      REDIS_URL: redis://tracearr-redis:6379
+      TZ: Asia/Kolkata
+    image: ghcr.io/connorgallopo/tracearr:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.tracearr.entrypoints: https
+      traefik.http.routers.tracearr.rule: Host(`tracearr.local.xerogravity.space`)
+      traefik.http.routers.tracearr.service: tracearr
+      traefik.http.routers.tracearr.tls: true
+      traefik.http.services.tracearr.loadbalancer.server.port: 3000
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: ./container_data/tracearr/backup
+      target: /data/backup
+      read_only: false

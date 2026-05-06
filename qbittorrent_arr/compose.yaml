@@ -38,9 +38,6 @@ services:
     container_name: qbittorrentvpn
     devices:
     - /dev/net/tun
-    sysctls:
-      net.ipv6.conf.all.disable_ipv6: 1
-      net.ipv6.conf.default.disable_ipv6: 1
     env_file:
     - .env
     environment:
@@ -52,7 +49,7 @@ services:
       PGID: 1000
       PUID: 1000
       STRICT_PORT_FORWARD: true
-      UMASK: 002
+      UMASK: 2
       USERSPACE_WIREGUARD: false
       VPN_CLIENT: openvpn
       VPN_ENABLED: true
@@ -94,6 +91,9 @@ services:
       traefik.http.services.radarr.loadbalancer.server.port: 7878
       traefik.http.services.sonarr.loadbalancer.server.port: 8989
     restart: unless-stopped
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 1
+      net.ipv6.conf.default.disable_ipv6: 1
     volumes:
     - type: bind
       source: /mnt/void/data/torrents
