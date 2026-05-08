@@ -14,6 +14,8 @@ services:
       JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
       JELLYFIN_BASE_URL: "http://jellyfin:8096"
       JELLYFIN_POLL_INTERVAL: 60s
+      QUARKUS_DATASOURCE_DB_KIND: sqlite
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:sqlite:/data/janitorr-stats.db
       TZ: Asia/Kolkata
     image: ghcr.io/schaka/janitorr-stats:stable-sqlite
     restart: unless-stopped
