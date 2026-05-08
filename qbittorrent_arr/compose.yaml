@@ -4,6 +4,17 @@ networks:
     external: true
 
 services:
+  byparr:
+    container_name: byparr
+    depends_on:
+    - qbittorrentvpn
+    environment:
+      LOG_LEVEL: info
+      PORT: 8192
+      TZ: Asia/Kolkata
+    image: ghcr.io/thephaseless/byparr:latest
+    network_mode: container:qbittorrentvpn
+    restart: unless-stopped
   flaresolverr:
     container_name: flaresolverr
     depends_on:
@@ -53,7 +64,7 @@ services:
       USERSPACE_WIREGUARD: false
       VPN_CLIENT: openvpn
       VPN_ENABLED: true
-      VPN_INPUT_PORTS: 8080,8191,9696,7878,8989
+      VPN_INPUT_PORTS: 8080,8191,8192,9696,7878,8989
       VPN_PASS: ${VPN_PASS}
       VPN_PROV: protonvpn
       VPN_USER: ${VPN_USER}
